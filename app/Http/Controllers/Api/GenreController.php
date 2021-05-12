@@ -29,24 +29,24 @@ class GenreController extends Controller
         return Genre::create($request->all());
     }
 
-    public function show(Genre $Genre): Genre
+    public function show(Genre $genre): Genre
     {
-        return $Genre;
+        return $genre;
     }
 
     /**
      * @throws ValidationException
      */
-    public function update(Request $request, Genre $Genre): Genre
+    public function update(Request $request, Genre $genre): Genre
     {
         $this->validate($request, $this->rules);
-        $Genre->update($request->all());
-        return $Genre;
+        $genre->update($request->all());
+        return $genre;
     }
 
-    public function destroy(Genre $Genre): Response
+    public function destroy(Genre $genre): Response
     {
-        $Genre->delete();
+        $genre->delete();
         return response()->noContent();
     }
 }
