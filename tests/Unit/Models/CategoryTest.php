@@ -49,18 +49,14 @@ class CategoryTest extends TestCase
     public function testCastsAttribute()
     {
         $modelArr = $this->category->getCasts();
-        foreach ($this->casts as $item) {
-            $this->assertContains($item, $modelArr);
-        }
+        $this->assertEqualsCanonicalizing($this->casts, $modelArr);
         $this->assertCount(count($this->casts), $modelArr);
     }
 
     public function testDatesAttribute()
     {
         $modelArr = $this->category->getDates();
-        foreach ($this->dates as $item) {
-            $this->assertContains($item, $modelArr);
-        }
+        $this->assertEqualsCanonicalizing($this->dates, $modelArr);
         $this->assertCount(count($this->dates), $modelArr);
     }
 
