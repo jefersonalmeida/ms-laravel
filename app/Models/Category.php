@@ -16,7 +16,8 @@ class Category extends Model
     use SoftDeletes;
     use Uuid;
 
-    protected $keyType = 'string';
+    public $incrementing = false;
+
     protected $fillable = [
         'is_active',
         'name',
@@ -24,10 +25,14 @@ class Category extends Model
     ];
 
     protected $dates = [
+        'created_at',
+        'updated_at',
         'deleted_at'
     ];
 
     protected $casts = [
-        'is_active' => 'boolean'
+        'id' => 'string',
+        'is_active' => 'boolean',
+        'deleted_at' => 'datetime',
     ];
 }
