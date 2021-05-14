@@ -4,6 +4,7 @@ namespace Tests\Feature\Models;
 
 use App\Models\Category;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Illuminate\Support\Str;
 use Tests\TestCase;
 
 class CategoryTest extends TestCase
@@ -32,6 +33,7 @@ class CategoryTest extends TestCase
         $model = Category::create(['name' => 'Test']);
         $model->refresh();
 
+        $this->assertTrue(Str::isUuid($model->id));
         $this->assertEquals('Test', $model->name);
         $this->assertNull($model->description);
         $this->assertTrue($model->is_active);
@@ -49,7 +51,7 @@ class CategoryTest extends TestCase
     public function testUpdate()
     {
         /** @var Category $category */
-        $category = Category::factory()->create()->first();
+        $category = Category::factory()->create();
 
         $data = [
             'name' => 'test_name_updated',
