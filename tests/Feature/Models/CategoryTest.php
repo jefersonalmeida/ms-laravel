@@ -50,18 +50,29 @@ class CategoryTest extends TestCase
 
     public function testUpdate()
     {
-        /** @var Category $category */
-        $category = Category::factory()->create();
+        /** @var Category $model */
+        $model = Category::factory()->create();
 
         $data = [
             'name' => 'test_name_updated',
             'description' => 'test_description_updated',
             'is_active' => false,
         ];
-        $category->update($data);
+        $model->update($data);
 
         foreach ($data as $key => $item) {
-            $this->assertEquals($item, $category->{$key});
+            $this->assertEquals($item, $model->{$key});
         }
+    }
+
+    public function testDeleteAndRestore()
+    {
+        /** @var Category $model */
+        $model = Category::factory()->create();
+        $model->delete();
+        $this->assertNull(Category::find($model->id));
+
+        $model->restore();
+        $this->assertNotNull(Category::find($model->id));
     }
 }
