@@ -10,7 +10,7 @@ use Tests\TestCase;
 
 class CategoryTest extends TestCase
 {
-    private Category $category;
+    private Category $model;
 
     private array $fillable = [
         'is_active',
@@ -38,7 +38,7 @@ class CategoryTest extends TestCase
 
     public function testFillableAttribute()
     {
-        $this->assertEquals($this->fillable, $this->category->getFillable());
+        $this->assertEquals($this->fillable, $this->model->getFillable());
     }
 
     public function testIfUseTraits()
@@ -48,26 +48,26 @@ class CategoryTest extends TestCase
 
     public function testCastsAttribute()
     {
-        $modelArr = $this->category->getCasts();
+        $modelArr = $this->model->getCasts();
         $this->assertEqualsCanonicalizing($this->casts, $modelArr);
         $this->assertCount(count($this->casts), $modelArr);
     }
 
     public function testDatesAttribute()
     {
-        $modelArr = $this->category->getDates();
+        $modelArr = $this->model->getDates();
         $this->assertEqualsCanonicalizing($this->dates, $modelArr);
         $this->assertCount(count($this->dates), $modelArr);
     }
 
     public function testIncrementing()
     {
-        $this->assertFalse($this->category->incrementing);
+        $this->assertFalse($this->model->incrementing);
     }
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->category = new Category();
+        $this->model = new Category();
     }
 }
