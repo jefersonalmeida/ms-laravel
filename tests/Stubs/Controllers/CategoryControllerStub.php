@@ -1,20 +1,20 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace Tests\Stubs\Controllers;
 
-use App\Models\Category;
+use App\Http\Controllers\Api\BasicCRUDController;
+use Tests\Stubs\Models\CategoryStub;
 
-class CategoryController extends BasicCRUDController
+class CategoryControllerStub extends BasicCRUDController
 {
     private array $rules = [
-        'is_active' => ['boolean'],
         'name' => ['required', 'max:255'],
-        'description' => ['nullable']
+        'description' => ['nullable'],
     ];
 
     protected function model(): string
     {
-        return Category::class;
+        return CategoryStub::class;
     }
 
     protected function rulesStore(): array

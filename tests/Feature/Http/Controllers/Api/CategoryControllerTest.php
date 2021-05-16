@@ -18,6 +18,13 @@ class CategoryControllerTest extends TestCase
 
     private Category $model;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->model = Category::factory()->create();
+    }
+
     public function testIndex()
     {
         $response = $this->get(route('categories.index'));
@@ -104,12 +111,6 @@ class CategoryControllerTest extends TestCase
 
         $response = $this->json('DELETE', route('categories.destroy', ['category' => $this->model->id]));
         $response->assertStatus(Response::HTTP_NOT_FOUND);
-    }
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-        $this->model = Category::factory()->create();
     }
 
     protected function routeStore(): string

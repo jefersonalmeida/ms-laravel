@@ -18,6 +18,12 @@ class GenreControllerTest extends TestCase
 
     private Genre $model;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->model = Genre::factory()->create();
+    }
+
     public function testIndex()
     {
         $response = $this->get(route('genres.index'));
@@ -89,12 +95,6 @@ class GenreControllerTest extends TestCase
 
         $response = $this->json('DELETE', route('genres.destroy', ['genre' => $this->model->id]));
         $response->assertStatus(Response::HTTP_NOT_FOUND);
-    }
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-        $this->model = Genre::factory()->create();
     }
 
     protected function routeStore(): string
