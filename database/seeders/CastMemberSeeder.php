@@ -2,10 +2,10 @@
 
 namespace Database\Seeders;
 
-use App\Models\Genre;
+use App\Models\CastMember;
 use Illuminate\Database\Seeder;
 
-class GenreSeeder extends Seeder
+class CastMemberSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -14,6 +14,6 @@ class GenreSeeder extends Seeder
      */
     public function run()
     {
-        Genre::factory()->count(100)->create();
+        CastMember::factory()->count(100)->create();
     }
 }

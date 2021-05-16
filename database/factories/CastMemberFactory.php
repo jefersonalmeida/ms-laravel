@@ -2,17 +2,17 @@
 
 namespace Database\Factories;
 
-use App\Models\Category;
+use App\Models\CastMember;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-class CategoryFactory extends Factory
+class CastMemberFactory extends Factory
 {
     /**
      * The name of the factory's corresponding model.
      *
      * @var string
      */
-    protected $model = Category::class;
+    protected $model = CastMember::class;
 
     /**
      * Define the model's default state.
@@ -22,8 +22,8 @@ class CategoryFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => $this->faker->colorName,
-            'description' => $this->faker->randomElement([$this->faker->sentence(), null]),
+            'name' => $this->faker->lastName,
+            'type' => $this->faker->randomElement([CastMember::TYPE_DIRECTOR, CastMember::TYPE_ACTOR])
         ];
     }
 }

@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Tests\TestCase;
 
-class GenreTest extends TestCase
+class GenreUnitTest extends TestCase
 {
     private Genre $model;
 

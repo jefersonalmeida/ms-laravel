@@ -21,7 +21,6 @@ class CategoryControllerTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-
         $this->model = Category::factory()->create();
     }
 
@@ -51,7 +50,6 @@ class CategoryControllerTest extends TestCase
         $this->assertInvalidationInStoreAction($data, 'max.string', ['max' => 255]);
         $this->assertInvalidationInUpdateAction($data, 'max.string', ['max' => 255]);
 
-
         $data = ['is_active' => 'A'];
         $this->assertInvalidationInStoreAction($data, 'boolean');
         $this->assertInvalidationInUpdateAction($data, 'boolean');
@@ -63,7 +61,8 @@ class CategoryControllerTest extends TestCase
     public function testStore()
     {
         $data = ['name' => 'test_name'];
-        $response = $this->assertStore($data,
+        $response = $this->assertStore(
+            $data,
             $data + ['description' => null, 'is_active' => true, 'deleted_at' => null]
         );
         $response->assertJsonStructure(['created_at', 'updated_at']);
@@ -77,12 +76,6 @@ class CategoryControllerTest extends TestCase
      */
     public function testUpdate()
     {
-        /** @var Category $model */
-        $this->model = Category::factory()->create([
-            'is_active' => false,
-            'description' => 'test_description',
-        ]);
-
         $data = [
             'is_active' => true,
             'name' => 'test_name',
