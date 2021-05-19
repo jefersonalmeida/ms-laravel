@@ -24,3 +24,4 @@ $exceptCreateAndEdit = ['create', 'edit'];
 Route::resource('categories', Api\CategoryController::class)->except($exceptCreateAndEdit);
 Route::resource('genres', Api\GenreController::class)->except($exceptCreateAndEdit);
 Route::resource('cast-members', Api\CastMemberController::class)->except($exceptCreateAndEdit);
+Route::resource('videos', Api\VideoController::class)->except($exceptCreateAndEdit);

@@ -23,7 +23,7 @@ class CastMemberFactory extends Factory
     {
         return [
             'name' => $this->faker->lastName,
-            'type' => $this->faker->randomElement([CastMember::TYPE_DIRECTOR, CastMember::TYPE_ACTOR])
+            'type' => $this->faker->randomElement(CastMember::$types)
         ];
     }
 }
