@@ -24,6 +24,7 @@ class VideoController extends BasicCRUDController
             'duration' => ['required', 'integer'],
             'category_ids' => ['required', 'array', 'exists:categories,id,deleted_at,NULL'],
             'genre_ids' => ['required', 'array', 'exists:genres,id,deleted_at,NULL'],
+            'video_file' => 'nullable',
         ];
     }
 

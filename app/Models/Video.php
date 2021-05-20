@@ -34,6 +34,7 @@ class Video extends Model
         'opened',
         'rating',
         'duration',
+        'video_file',
     ];
 
     protected $dates = [
@@ -141,6 +142,6 @@ class Video extends Model
 
     protected static function fileFields(): array
     {
-        return ['filme', 'banner', 'trailer'];
+        return ['video_file'];
     }
 }

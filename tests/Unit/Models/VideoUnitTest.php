@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Models;
 
+use App\Models\Traits\UploadFiles;
 use App\Models\Traits\Uuid;
 use App\Models\Video;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -19,6 +20,7 @@ class VideoUnitTest extends TestCase
         'opened',
         'rating',
         'duration',
+        'video_file',
     ];
 
     private array $dates = [
@@ -39,6 +41,7 @@ class VideoUnitTest extends TestCase
         HasFactory::class,
         SoftDeletes::class,
         Uuid::class,
+        UploadFiles::class,
     ];
 
     public function testFillableAttribute()
