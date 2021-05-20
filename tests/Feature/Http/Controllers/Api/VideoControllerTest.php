@@ -2,10 +2,16 @@
 
 namespace Tests\Feature\Http\Controllers\Api;
 
+use App\Http\Controllers\Api\VideoController;
+use App\Models\Category;
+use App\Models\Genre;
 use App\Models\Video;
 use Exception;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Mockery;
+use Tests\Exceptions\TestException;
 use Tests\TestCase;
 use Tests\Traits\TestSaves;
 use Tests\Traits\TestValidations;
@@ -17,7 +23,7 @@ class VideoControllerTest extends TestCase
     use TestSaves;
 
     private Video $model;
-    private $sendData;
+    private array $sendData;
 
     protected function setUp(): void
     {
@@ -27,6 +33,7 @@ class VideoControllerTest extends TestCase
             'title' => 'test_title',
             'description' => 'test_description',
             'year_launched' => 2020,
+            'opened' => false,
             'rating' => Video::RATING_LIST[0],
             'duration' => 90,
         ];
@@ -96,22 +103,86 @@ class VideoControllerTest extends TestCase
         $this->assertInvalidationInUpdateAction($data, 'in');
     }
 
+    public function testInvalidateCategoryIds()
+    {
+        $data = ['category_ids' => 'a'];
+        $this->assertInvalidationInStoreAction($data, 'array');
+        $this->assertInvalidationInUpdateAction($data, 'array');
+
+        $data = ['category_ids' => [100]];
+        $this->assertInvalidationInStoreAction($data, 'exists');
+        $this->assertInvalidationInUpdateAction($data, 'exists');
+    }
+
+    public function testInvalidateGenreIds()
+    {
+        $data = ['genre_ids' => 'a'];
+        $this->assertInvalidationInStoreAction($data, 'array');
+        $this->assertInvalidationInUpdateAction($data, 'array');
+
+        $data = ['genre_ids' => [100]];
+        $this->assertInvalidationInStoreAction($data, 'exists');
+        $this->assertInvalidationInUpdateAction($data, 'exists');
+    }
+
+    public function testRollbackStore()
+    {
+        $controller = Mockery::mock(VideoController::class)
+            ->makePartial()
+            ->shouldAllowMockingProtectedMethods();
+
+        $controller->shouldReceive('validate')
+            ->withAnyArgs()
+            ->andReturn($this->sendData);
+
+        $controller->shouldReceive('rulesStore')
+            ->withAnyArgs()
+            ->andReturn([]);
+
+        $controller
+            ->shouldReceive('handleRelations')
+            ->once()
+            ->andThrow(new TestException());
+
+        $request = Mockery::mock(Request::class);
+
+        try {
+            $controller->store($request);
+        } catch (TestException $e) {
+            $this->assertCount(1, Video::all());
+        }
+    }
+
     /**
      * @throws Exception
      */
     public function testSave()
     {
+        $category = Category::factory()->create();
+        $genre = Genre::factory()->create();
+
         $data = [
             [
-                'send_data' => $this->sendData,
+                'send_data' => $this->sendData + [
+                        'category_ids' => [$category->id],
+                        'genre_ids' => [$genre->id],
+                    ],
                 'test_data' => $this->sendData + ['opened' => false, 'deleted_at' => null],
             ],
             [
-                'send_data' => $this->sendData + ['opened' => true],
+                'send_data' => $this->sendData + [
+                        'opened' => true,
+                        'category_ids' => [$category->id],
+                        'genre_ids' => [$genre->id],
+                    ],
                 'test_data' => $this->sendData + ['opened' => true, 'deleted_at' => null],
             ],
             [
-                'send_data' => $this->sendData + ['rating' => Video::RATING_LIST[1]],
+                'send_data' => $this->sendData + [
+                        'rating' => Video::RATING_LIST[1],
+                        'category_ids' => [$category->id],
+                        'genre_ids' => [$genre->id],
+                    ],
                 'test_data' => $this->sendData + ['rating' => Video::RATING_LIST[1], 'deleted_at' => null],
             ]
         ];
