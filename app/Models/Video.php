@@ -51,7 +51,7 @@ class Video extends Model
             'category_id',
             'id',
             'id',
-        );
+        )->withTrashed();
     }
 
     public function genres(): BelongsToMany
@@ -63,6 +63,6 @@ class Video extends Model
             'genre_id',
             'id',
             'id',
-        );
+        )->withTrashed();
     }
 }

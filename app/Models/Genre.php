@@ -45,6 +45,6 @@ class Genre extends Model
             'category_id',
             'id',
             'id',
-        );
+        )->withTrashed();
     }
 }
