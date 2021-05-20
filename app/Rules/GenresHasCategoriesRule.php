@@ -6,9 +6,10 @@ use Illuminate\Contracts\Validation\Rule;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
-class GenreHasCategoriesRule implements Rule
+class GenresHasCategoriesRule implements Rule
 {
     private array $categoryIds;
+    private array $genreIds;
 
     /**
      * Create a new rule instance.
@@ -29,28 +30,32 @@ class GenreHasCategoriesRule implements Rule
      */
     public function passes($attribute, $value): bool
     {
-        $genreIds = array_unique($value);
-        if (!count($genreIds) || !count($this->categoryIds)) {
+        if (!is_array($value)) {
+            $value = [];
+        }
+        $this->genreIds = array_unique($value);
+        if (!count($this->genreIds) || !count($this->categoryIds)) {
             return false;
         }
 
         $categories = [];
-        foreach ($genreIds as $genreId) {
+        foreach ($this->genreIds as $genreId) {
             $rows = $this->getRows($genreId);
             if (!$rows->count()) {
                 return false;
             }
             array_push($categories, ...$rows->pluck('category_id')->toArray());
         }
-        return count($categories) === count($this->categoryIds);
+        return count(array_unique($categories)) === count($this->categoryIds);
     }
 
     public function message(): string
     {
-        return 'A genre ID must be related at least a category ID.';
+        // return 'A genre ID must be related at least a category ID.';
+        return __('validation.genres_has_categories');
     }
 
-    private function getRows($genreId): Collection
+    protected function getRows($genreId): Collection
     {
         return DB::table('categories_genres')
             ->where('genre_id', '=', $genreId)

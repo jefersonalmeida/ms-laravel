@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Models\Video;
+use App\Rules\GenresHasCategoriesRule;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -27,6 +28,14 @@ class VideoController extends BasicCRUDController
         ];
     }
 
+    protected function addRuleIfGenreHasCategories(Request $request)
+    {
+        $categories = $request->get('category_ids');
+        $this->rules['genre_ids'][] = new GenresHasCategoriesRule(
+            is_array($categories) ? $categories : []
+        );
+    }
+
     /**
      * @throws Throwable
      * @throws ValidationException
@@ -34,6 +43,7 @@ class VideoController extends BasicCRUDController
     public function store(Request $request): Model
     {
         /** @var Video $model */
+        $this->addRuleIfGenreHasCategories($request);
         $data = $this->validate($request, $this->rulesStore());
         return DB::transaction(function () use ($data, $request) {
             $model = $this->model()::create($data);
@@ -50,6 +60,7 @@ class VideoController extends BasicCRUDController
     public function update(Request $request, $id): Model
     {
         /** @var Video $model */
+        $this->addRuleIfGenreHasCategories($request);
         $data = $this->validate($request, $this->rulesUpdate());
         return DB::transaction(function () use ($id, $data, $request) {
             $model = $this->findOrFail($id);
