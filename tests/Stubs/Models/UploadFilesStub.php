@@ -13,4 +13,9 @@ class UploadFilesStub extends Model
     {
         return '1';
     }
+
+    protected static function fileFields(): array
+    {
+        return ['file1', 'file2'];
+    }
 }

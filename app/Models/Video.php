@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Traits\UploadFiles;
 use App\Models\Traits\Uuid;
 use Exception;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -19,6 +20,7 @@ class Video extends Model
     use HasFactory;
     use SoftDeletes;
     use Uuid;
+    use UploadFiles;
 
     const NO_RATING = 'L';
     const RATING_LIST = [self::NO_RATING, '10', '12', '14', '16', '18'];
@@ -51,14 +53,18 @@ class Video extends Model
     /**
      * @throws Throwable
      */
-    public static function create(array $attributes = [])
+    public static function create(array $attributes = []): Video
     {
+        $files = self::extractFiles($attributes);
+
         DB::beginTransaction();
         try {
             /** @var Video $model */
             $model = self::query()->create($attributes);
             self::handleRelations($model, $attributes);
-            // upload
+
+            $model->uploadFiles($files);
+
             DB::commit();
             return $model;
         } catch (Exception $e) {
@@ -126,5 +132,15 @@ class Video extends Model
         if (isset($attributes['genre_ids'])) {
             $model->genres()->sync($attributes['genre_ids']);
         }
+    }
+
+    protected function uploadDir(): string
+    {
+        return $this->id;
+    }
+
+    protected static function fileFields(): array
+    {
+        return ['filme', 'banner', 'trailer'];
     }
 }
