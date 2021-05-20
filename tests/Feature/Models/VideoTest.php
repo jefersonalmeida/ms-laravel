@@ -3,9 +3,11 @@
 namespace Tests\Feature\Models;
 
 use App\Models\Video;
+use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Str;
 use Tests\TestCase;
+use Throwable;
 
 class VideoTest extends TestCase
 {
@@ -81,5 +83,48 @@ class VideoTest extends TestCase
 
         $model->restore();
         $this->assertNotNull(Video::find($model->id));
+    }
+
+    public function testRollbackCreate()
+    {
+        $hasError = false;
+        try {
+            Video::create([
+                'title' => 'test_title',
+                'description' => 'test_description',
+                'year_launched' => 2020,
+                'opened' => false,
+                'rating' => Video::RATING_LIST[0],
+                'duration' => 90,
+                'category_ids' => [0, 1, 2]
+            ]);
+        } catch (QueryException $exception) {
+            $this->assertCount(0, Video::all());
+            $hasError = true;
+        }
+        $this->assertTrue($hasError);
+    }
+
+    public function testRollbackUpdate()
+    {
+        /** @var Video $model */
+        $model = Video::factory()->create();
+        $title = $model->title;
+        $hasError = false;
+        try {
+            $model->update([
+                'title' => 'test_title',
+                'description' => 'test_description',
+                'year_launched' => 2020,
+                'opened' => false,
+                'rating' => Video::RATING_LIST[0],
+                'duration' => 90,
+                'category_ids' => [0, 1, 2]
+            ]);
+        } catch (QueryException | Throwable $exception) {
+            $this->assertDatabaseHas('videos', ['title' => $title]);
+            $hasError = true;
+        }
+        $this->assertTrue($hasError);
     }
 }

@@ -3,10 +3,13 @@
 namespace App\Models;
 
 use App\Models\Traits\Uuid;
+use Exception;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\DB;
+use Throwable;
 
 /**
  * @mixin IdeHelperVideo
@@ -45,6 +48,51 @@ class Video extends Model
         'deleted_at' => 'datetime',
     ];
 
+    /**
+     * @throws Throwable
+     */
+    public static function create(array $attributes = [])
+    {
+        DB::beginTransaction();
+        try {
+            /** @var Video $model */
+            $model = self::query()->create($attributes);
+            self::handleRelations($model, $attributes);
+            // upload
+            DB::commit();
+            return $model;
+        } catch (Exception $e) {
+            if (isset($model)) {
+                // excluir os arquivos
+            }
+            DB::rollBack();
+            throw $e;
+        }
+    }
+
+    /**
+     * @throws Throwable
+     */
+    public function update(array $attributes = [], array $options = []): bool
+    {
+        DB::beginTransaction();
+        try {
+            $saved = parent::update($attributes, $options);
+            self::handleRelations($this, $attributes);
+            if ($saved) {
+                // upload
+                // excluir os antigos
+            }
+            DB::commit();
+            return $saved;
+        } catch (Exception $e) {
+            // excluir os arquivos
+            DB::rollBack();
+            throw $e;
+        }
+    }
+
+
     public function categories(): BelongsToMany
     {
         return $this->belongsToMany(
@@ -67,5 +115,16 @@ class Video extends Model
             'id',
             'id',
         )->withTrashed();
+    }
+
+
+    public static function handleRelations(Video $model, array $attributes): void
+    {
+        if (isset($attributes['category_ids'])) {
+            $model->categories()->sync($attributes['category_ids']);
+        }
+        if (isset($attributes['genre_ids'])) {
+            $model->genres()->sync($attributes['genre_ids']);
+        }
     }
 }

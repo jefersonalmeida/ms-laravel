@@ -6,7 +6,6 @@ use App\Models\Video;
 use App\Rules\GenresHasCategoriesRule;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 use Throwable;
 
@@ -45,12 +44,9 @@ class VideoController extends BasicCRUDController
         /** @var Video $model */
         $this->addRuleIfGenreHasCategories($request);
         $data = $this->validate($request, $this->rulesStore());
-        return DB::transaction(function () use ($data, $request) {
-            $model = $this->model()::create($data);
-            $this->handleRelations($model, $request);
-            $model->refresh();
-            return $model;
-        });
+        $model = $this->model()::create($data);
+        $model->refresh();
+        return $model;
     }
 
     /**
@@ -62,12 +58,9 @@ class VideoController extends BasicCRUDController
         /** @var Video $model */
         $this->addRuleIfGenreHasCategories($request);
         $data = $this->validate($request, $this->rulesUpdate());
-        return DB::transaction(function () use ($id, $data, $request) {
-            $model = $this->findOrFail($id);
-            $model->update($data);
-            $this->handleRelations($model, $request);
-            return $model;
-        });
+        $model = $this->findOrFail($id);
+        $model->update($data);
+        return $model;
     }
 
     protected function model(): string
@@ -84,15 +77,4 @@ class VideoController extends BasicCRUDController
     {
         return $this->rules;
     }
-
-    /**
-     * @param $model
-     * @param Request $request
-     */
-    protected function handleRelations($model, Request $request): void
-    {
-        $model->categories()->sync($request->get('category_ids'));
-        $model->genres()->sync($request->get('genre_ids'));
-    }
-
 }
