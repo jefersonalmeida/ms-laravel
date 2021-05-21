@@ -14,7 +14,7 @@ class GenreController extends BasicCRUDController
     private array $rules = [
         'is_active' => ['boolean'],
         'name' => ['required', 'max:255'],
-        'category_ids' => ['required', 'array', 'exists:categories,id,deleted_at,NULL'],
+        'categories_id' => ['required', 'array', 'exists:categories,id,deleted_at,NULL'],
     ];
 
 
@@ -71,6 +71,6 @@ class GenreController extends BasicCRUDController
      */
     protected function handleRelations($model, Request $request): void
     {
-        $model->categories()->sync($request->get('category_ids'));
+        $model->categories()->sync($request->get('categories_id'));
     }
 }

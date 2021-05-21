@@ -22,16 +22,16 @@ class VideoController extends BasicCRUDController
             'opened' => ['boolean'],
             'rating' => ['required', 'in:' . join(',', Video::RATING_LIST)],
             'duration' => ['required', 'integer'],
-            'category_ids' => ['required', 'array', 'exists:categories,id,deleted_at,NULL'],
-            'genre_ids' => ['required', 'array', 'exists:genres,id,deleted_at,NULL'],
-            'video_file' => 'nullable',
+            'categories_id' => ['required', 'array', 'exists:categories,id,deleted_at,NULL'],
+            'genres_id' => ['required', 'array', 'exists:genres,id,deleted_at,NULL'],
+            'video_file' => ['nullable', 'mimetypes:video/mp4', 'max:12'],
         ];
     }
 
     protected function addRuleIfGenreHasCategories(Request $request)
     {
-        $categories = $request->get('category_ids');
-        $this->rules['genre_ids'][] = new GenresHasCategoriesRule(
+        $categories = $request->get('categories_id');
+        $this->rules['genres_id'][] = new GenresHasCategoriesRule(
             is_array($categories) ? $categories : []
         );
     }

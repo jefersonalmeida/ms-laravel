@@ -38,6 +38,9 @@ class GenreTest extends TestCase
 
         $model = Genre::create(['name' => 'Test', 'is_active' => false]);
         $this->assertFalse($model->is_active);
+
+        $model = Genre::create(['name' => 'Test', 'is_active' => true]);
+        $this->assertTrue($model->is_active);
     }
 
     public function testUpdate()

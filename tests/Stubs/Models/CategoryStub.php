@@ -19,12 +19,10 @@ class CategoryStub extends Model
             $table->text('description')->nullable();
             $table->timestamps();
         });
-        // (new \CreateCategoriesTable())->up();
     }
 
     public static function dropTable()
     {
         Schema::dropIfExists('categories_stubs');
-        // (new \CreateCategoriesTable())->down();
     }
 }

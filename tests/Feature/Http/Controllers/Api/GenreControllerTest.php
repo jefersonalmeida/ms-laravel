@@ -47,7 +47,7 @@ class GenreControllerTest extends TestCase
 
     public function testInvalidateData()
     {
-        $data = ['name' => '', 'category_ids' => ''];
+        $data = ['name' => '', 'categories_id' => ''];
         $this->assertInvalidationInStoreAction($data, 'required');
         $this->assertInvalidationInUpdateAction($data, 'required');
 
@@ -59,18 +59,18 @@ class GenreControllerTest extends TestCase
         $this->assertInvalidationInStoreAction($data, 'boolean');
         $this->assertInvalidationInUpdateAction($data, 'boolean');
 
-        $data = ['category_ids' => 'a'];
+        $data = ['categories_id' => 'a'];
         $this->assertInvalidationInStoreAction($data, 'array');
         $this->assertInvalidationInUpdateAction($data, 'array');
 
-        $data = ['category_ids' => [100]];
+        $data = ['categories_id' => [100]];
         $this->assertInvalidationInStoreAction($data, 'exists');
         $this->assertInvalidationInUpdateAction($data, 'exists');
 
         $category = Category::factory()->create();
         $category->delete();
 
-        $data = ['category_ids' => [$category->id]];
+        $data = ['categories_id' => [$category->id]];
         $this->assertInvalidationInStoreAction($data, 'exists');
         $this->assertInvalidationInUpdateAction($data, 'exists');
     }
@@ -153,7 +153,7 @@ class GenreControllerTest extends TestCase
         $category = Category::factory()->create();
         $data = ['name' => 'test_name'];
         $response = $this->assertStore(
-            $data + ['category_ids' => [$category->id]],
+            $data + ['categories_id' => [$category->id]],
             $data + ['is_active' => true, 'deleted_at' => null]
         );
         $response->assertJsonStructure(['created_at', 'updated_at']);
@@ -162,7 +162,7 @@ class GenreControllerTest extends TestCase
 
         $data = ['is_active' => false, 'name' => 'test_name'];
         $this->assertStore(
-            $data + ['category_ids' => [$category->id]],
+            $data + ['categories_id' => [$category->id]],
             $data + ['deleted_at' => null]
         );
     }
@@ -176,12 +176,12 @@ class GenreControllerTest extends TestCase
 
         $data = ['is_active' => true, 'name' => 'test_name'];
         $response = $this->assertUpdate(
-            $data + ['category_ids' => [$category->id]],
+            $data + ['categories_id' => [$category->id]],
             $data + ['is_active' => true, 'deleted_at' => null]);
         $response->assertJsonStructure(['created_at', 'updated_at']);
 
         $data['is_active'] = false;
-        $this->assertUpdate($data + ['category_ids' => [$category->id]], $data);
+        $this->assertUpdate($data + ['categories_id' => [$category->id]], $data);
     }
 
     public function testDelete()
@@ -202,7 +202,7 @@ class GenreControllerTest extends TestCase
 
         $sendData = [
             'name' => 'Test',
-            'category_ids' => [$categoryIds[0]]
+            'categories_id' => [$categoryIds[0]]
         ];
 
         $response = $this->json('POST', $this->routeStore(), $sendData);
@@ -213,7 +213,7 @@ class GenreControllerTest extends TestCase
 
         $sendData = [
             'name' => 'Test',
-            'category_ids' => [$categoryIds[1], $categoryIds[2]]
+            'categories_id' => [$categoryIds[1], $categoryIds[2]]
         ];
 
         $response = $this->json('PUT',

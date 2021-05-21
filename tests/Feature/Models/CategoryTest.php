@@ -46,6 +46,9 @@ class CategoryTest extends TestCase
 
         $model = Category::create(['name' => 'Test', 'is_active' => false]);
         $this->assertFalse($model->is_active);
+
+        $model = Category::create(['name' => 'Test', 'is_active' => true]);
+        $this->assertTrue($model->is_active);
     }
 
     public function testUpdate()
