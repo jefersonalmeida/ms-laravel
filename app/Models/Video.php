@@ -34,6 +34,7 @@ class Video extends Model
         'opened',
         'rating',
         'duration',
+        'thumb_file',
         'video_file',
     ];
 
@@ -70,7 +71,7 @@ class Video extends Model
             return $model;
         } catch (Exception $e) {
             if (isset($model)) {
-                // excluir os arquivos
+                $model->deleteFiles($files);
             }
             DB::rollBack();
             throw $e;
@@ -82,18 +83,22 @@ class Video extends Model
      */
     public function update(array $attributes = [], array $options = []): bool
     {
+        $files = self::extractFiles($attributes);
+
         DB::beginTransaction();
         try {
             $saved = parent::update($attributes, $options);
             self::handleRelations($this, $attributes);
             if ($saved) {
-                // upload
-                // excluir os antigos
+                $this->uploadFiles($files);
             }
             DB::commit();
+            if ($saved && count($files)) {
+                $this->deleteOldFiles();
+            }
             return $saved;
         } catch (Exception $e) {
-            // excluir os arquivos
+            $this->deleteFiles($files);
             DB::rollBack();
             throw $e;
         }
@@ -127,11 +132,11 @@ class Video extends Model
 
     public static function handleRelations(Video $model, array $attributes): void
     {
-        if (isset($attributes['category_ids'])) {
-            $model->categories()->sync($attributes['category_ids']);
+        if (isset($attributes['categories_id'])) {
+            $model->categories()->sync($attributes['categories_id']);
         }
-        if (isset($attributes['genre_ids'])) {
-            $model->genres()->sync($attributes['genre_ids']);
+        if (isset($attributes['genres_id'])) {
+            $model->genres()->sync($attributes['genres_id']);
         }
     }
 
@@ -140,8 +145,8 @@ class Video extends Model
         return $this->id;
     }
 
-    protected static function fileFields(): array
+    public static function fileFields(): array
     {
-        return ['video_file'];
+        return ['video_file', 'thumb_file'];
     }
 }
