@@ -19,7 +19,8 @@ class UploadFilesUnitTest extends TestCase
 
     public function testUploadFile()
     {
-        Storage::fake();
+        // Storage::disk('gcs');
+        // Storage::fake();
         $file = UploadedFile::fake()->create('video.mp4');
         $this->model->uploadFile($file);
         Storage::assertExists(sprintf('1/%s', $file->hashName()));
