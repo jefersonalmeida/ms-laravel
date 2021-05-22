@@ -76,4 +76,14 @@ trait UploadFiles
         }
         return $files;
     }
+
+    public function relativeFilePath($value): string
+    {
+        return sprintf('%s/%s', $this->uploadDir(), $value);
+    }
+
+    public function getFileUrl($filename): string
+    {
+        return Storage::url($this->relativeFilePath($filename));
+    }
 }

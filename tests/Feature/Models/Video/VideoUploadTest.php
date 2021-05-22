@@ -5,6 +5,7 @@ namespace Tests\Feature\Models\Video;
 use App\Models\Video;
 use Illuminate\Database\Events\TransactionCommitted;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Storage;
 use Tests\Exceptions\TestException;
@@ -101,5 +102,49 @@ class VideoUploadTest extends BaseVideoTestCase
             $hasError = true;
         }
         $this->assertTrue($hasError);
+    }
+
+    public function testFileUrlsWithLocalDriver()
+    {
+        $fileFields = [];
+        foreach (Video::fileFields() as $field) {
+            $fileFields[$field] = sprintf('%s.test', $field);
+        }
+        /** @var Video $video */
+        $video = Video::factory()->create($fileFields);
+
+        Config::set('filesystems.default', 'video_local');
+        $localDriver = config('filesystems.default');
+        $baseUrl = config(sprintf('filesystems.disks.%s.url', $localDriver));
+        foreach ($fileFields as $field => $value) {
+            $fileUrl = $video->{"{$field}_url"};
+            $this->assertEquals(sprintf('%s/%s/%s', $baseUrl, $video->id, $value), $fileUrl);
+        }
+    }
+
+    public function testFileUrlsWithGcsDriver()
+    {
+        $fileFields = [];
+        foreach (Video::fileFields() as $field) {
+            $fileFields[$field] = sprintf('%s.test', $field);
+        }
+        /** @var Video $video */
+        $video = Video::factory()->create($fileFields);
+        $baseUrl = config('filesystems.disks.gcs.storage_api_uri');
+        Config::set('filesystems.default', 'gcs');
+        foreach ($fileFields as $field => $value) {
+            $fileUrl = $video->{"{$field}_url"};
+            $this->assertEquals(sprintf('%s/%s/%s', $baseUrl, $video->id, $value), $fileUrl);
+        }
+    }
+
+    public function testFileUrlsIfNullWhenFieldsAreNull()
+    {
+        /** @var Video $video */
+        $video = Video::factory()->create();
+        foreach (Video::fileFields() as $field) {
+            $fileUrl = $video->{"{$field}_url"};
+            $this->assertNull($fileUrl);
+        }
     }
 }

@@ -21,6 +21,8 @@ class VideoUnitTest extends TestCase
         'rating',
         'duration',
         'thumb_file',
+        'banner_file',
+        'trailer_file',
         'video_file',
     ];
 

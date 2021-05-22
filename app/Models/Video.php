@@ -25,6 +25,11 @@ class Video extends Model
     const NO_RATING = 'L';
     const RATING_LIST = [self::NO_RATING, '10', '12', '14', '16', '18'];
 
+    const THUMB_FILE_MAX_SIZE = 1024 * 5;
+    const BANNER_FILE_MAX_SIZE = 1024 * 10;
+    const TRAILER_FILE_MAX_SIZE = 1024 * 1024 * 1;
+    const VIDEO_FILE_MAX_SIZE = 1024 * 1024 * 10;
+
     public $incrementing = false;
 
     protected $fillable = [
@@ -35,6 +40,8 @@ class Video extends Model
         'rating',
         'duration',
         'thumb_file',
+        'banner_file',
+        'trailer_file',
         'video_file',
     ];
 
@@ -147,6 +154,31 @@ class Video extends Model
 
     public static function fileFields(): array
     {
-        return ['video_file', 'thumb_file'];
+        return [
+            'thumb_file',
+            'banner_file',
+            'trailer_file',
+            'video_file',
+        ];
+    }
+
+    public function getThumbFileUrlAttribute(): ?string
+    {
+        return $this->thumb_file ? $this->getFileUrl($this->thumb_file) : null;
+    }
+
+    public function getBannerFileUrlAttribute(): ?string
+    {
+        return $this->banner_file ? $this->getFileUrl($this->banner_file) : null;
+    }
+
+    public function getTrailerFileUrlAttribute(): ?string
+    {
+        return $this->trailer_file ? $this->getFileUrl($this->trailer_file) : null;
+    }
+
+    public function getVideoFileUrlAttribute(): ?string
+    {
+        return $this->video_file ? $this->getFileUrl($this->video_file) : null;
     }
 }
