@@ -2,11 +2,14 @@
 
 namespace Tests\Feature\Http\Controllers\Api;
 
+use App\Http\Resources\CategoryResource;
 use App\Models\Category;
 use Exception;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Http\Response;
+use Illuminate\Testing\TestResponse;
 use Tests\TestCase;
+use Tests\Traits\TestResource;
 use Tests\Traits\TestSaves;
 use Tests\Traits\TestValidations;
 
@@ -15,8 +18,18 @@ class CategoryControllerTest extends TestCase
     use DatabaseMigrations;
     use TestValidations;
     use TestSaves;
+    use TestResource;
 
     private Category $model;
+    private array $serializedFields = [
+        'id',
+        'is_active',
+        'name',
+        'description',
+        'created_at',
+        'updated_at',
+        'deleted_at',
+    ];
 
     protected function setUp(): void
     {
@@ -27,9 +40,19 @@ class CategoryControllerTest extends TestCase
     public function testIndex()
     {
         $response = $this->get(route('categories.index'));
-        $response
-            ->assertStatus(Response::HTTP_OK)
-            ->assertJson([$this->model->toArray()]);
+
+        $response->assertStatus(Response::HTTP_OK)
+            ->assertJson([
+                'meta' => ['per_page' => 15]
+            ])
+            ->assertJsonStructure([
+                'data' => ['*' => $this->serializedFields],
+                'links' => [],
+                'meta' => [],
+            ]);
+
+        $resource = CategoryResource::collection(collect()->add($this->model));
+        $this->assertResource($response, $resource);
     }
 
     public function testShow()
@@ -37,7 +60,9 @@ class CategoryControllerTest extends TestCase
         $response = $this->get(route('categories.show', ['category' => $this->model->id]));
         $response
             ->assertStatus(Response::HTTP_OK)
-            ->assertJson($this->model->toArray());
+            ->assertJsonStructure(['data' => $this->serializedFields]);
+
+        $this->assertResourceModel($response);
     }
 
     public function testInvalidateData()
@@ -65,10 +90,12 @@ class CategoryControllerTest extends TestCase
             $data,
             $data + ['description' => null, 'is_active' => true, 'deleted_at' => null]
         );
-        $response->assertJsonStructure(['created_at', 'updated_at']);
+        $response->assertJsonStructure(['data' => $this->serializedFields]);
 
         $data = ['is_active' => false, 'name' => 'test_name', 'description' => 'test_description'];
         $this->assertStore($data, $data + ['deleted_at' => null]);
+
+        $this->assertResourceModel($response);
     }
 
     /**
@@ -82,7 +109,8 @@ class CategoryControllerTest extends TestCase
             'description' => 'test_description_updated',
         ];
         $response = $this->assertUpdate($data, $data + ['deleted_at' => null]);
-        $response->assertJsonStructure(['created_at', 'updated_at']);
+        $response->assertJsonStructure(['data' => $this->serializedFields]);
+        $this->assertResourceModel($response);
 
         $data['description'] = '';
         $this->assertUpdate($data, array_merge($data, ['description' => null]));
@@ -119,5 +147,11 @@ class CategoryControllerTest extends TestCase
     protected function model(): string
     {
         return Category::class;
+    }
+
+    protected function assertResourceModel(TestResponse $response): void
+    {
+        $resource = new CategoryResource($this->model()::find($this->getIdFromResponse($response)));
+        $this->assertResource($response, $resource);
     }
 }

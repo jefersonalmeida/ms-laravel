@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Http\Resources\CategoryResource;
 use App\Models\Category;
 
 class CategoryController extends BasicCRUDController
@@ -25,5 +26,15 @@ class CategoryController extends BasicCRUDController
     protected function rulesUpdate(): array
     {
         return $this->rules;
+    }
+
+    protected function resourceCollection(): string
+    {
+        return $this->resource();
+    }
+
+    protected function resource(): string
+    {
+        return CategoryResource::class;
     }
 }

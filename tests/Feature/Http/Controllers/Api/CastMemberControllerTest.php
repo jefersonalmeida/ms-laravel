@@ -2,11 +2,14 @@
 
 namespace Tests\Feature\Http\Controllers\Api;
 
+use App\Http\Resources\CastMemberResource;
 use App\Models\CastMember;
 use Exception;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Http\Response;
+use Illuminate\Testing\TestResponse;
 use Tests\TestCase;
+use Tests\Traits\TestResource;
 use Tests\Traits\TestSaves;
 use Tests\Traits\TestValidations;
 
@@ -15,8 +18,17 @@ class CastMemberControllerTest extends TestCase
     use DatabaseMigrations;
     use TestValidations;
     use TestSaves;
+    use TestResource;
 
     private CastMember $model;
+    private array $serializedFields = [
+        'id',
+        'name',
+        'type',
+        'created_at',
+        'updated_at',
+        'deleted_at',
+    ];
 
     protected function setUp(): void
     {
@@ -27,9 +39,18 @@ class CastMemberControllerTest extends TestCase
     public function testIndex()
     {
         $response = $this->get(route('cast-members.index'));
-        $response
-            ->assertStatus(Response::HTTP_OK)
-            ->assertJson([$this->model->toArray()]);
+        $response->assertStatus(Response::HTTP_OK)
+            ->assertJson([
+                'meta' => ['per_page' => 15]
+            ])
+            ->assertJsonStructure([
+                'data' => ['*' => $this->serializedFields],
+                'links' => [],
+                'meta' => [],
+            ]);
+
+        $resource = CastMemberResource::collection(collect()->add($this->model));
+        $this->assertResource($response, $resource);
     }
 
     public function testShow()
@@ -37,7 +58,9 @@ class CastMemberControllerTest extends TestCase
         $response = $this->get(route('cast-members.show', ['cast_member' => $this->model->id]));
         $response
             ->assertStatus(Response::HTTP_OK)
-            ->assertJson($this->model->toArray());
+            ->assertJsonStructure(['data' => $this->serializedFields]);
+
+        $this->assertResourceModel($response);
     }
 
     public function testInvalidateData()
@@ -67,7 +90,9 @@ class CastMemberControllerTest extends TestCase
 
         foreach ($data as $value) {
             $response = $this->assertStore($value, $value + ['deleted_at' => null]);
-            $response->assertJsonStructure(['created_at', 'updated_at']);
+            $response->assertJsonStructure(['data' => $this->serializedFields]);
+
+            $this->assertResourceModel($response);
         }
     }
 
@@ -78,7 +103,9 @@ class CastMemberControllerTest extends TestCase
     {
         $data = ['name' => 'test_name_actor', 'type' => CastMember::TYPE_ACTOR];
         $response = $this->assertUpdate($data, $data + ['deleted_at' => null]);
-        $response->assertJsonStructure(['created_at', 'updated_at']);
+        $response->assertJsonStructure(['data' => $this->serializedFields]);
+
+        $this->assertResourceModel($response);
     }
 
     public function testDelete()
@@ -106,5 +133,11 @@ class CastMemberControllerTest extends TestCase
     protected function model(): string
     {
         return CastMember::class;
+    }
+
+    protected function assertResourceModel(TestResponse $response): void
+    {
+        $resource = new CastMemberResource($this->model()::find($this->getIdFromResponse($response)));
+        $this->assertResource($response, $resource);
     }
 }

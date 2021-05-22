@@ -6,6 +6,8 @@ use App\Models\Category;
 use App\Models\Genre;
 use App\Models\Video;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Testing\TestResponse;
 use Tests\TestCase;
 
 abstract class BaseVideoControllerTestCase extends TestCase
@@ -20,6 +22,10 @@ abstract class BaseVideoControllerTestCase extends TestCase
         parent::setUp();
         $this->model = Video::factory()->create([
             'opened' => false,
+            'thumb_file' => 'thumb_file.jpg',
+            'banner_file' => 'banner_file.jpg',
+            'trailer_file' => 'trailer_file.mp4',
+            'video_file' => 'video_file.mp4',
         ]);
 
         /** @var Category $category */
@@ -53,5 +59,19 @@ abstract class BaseVideoControllerTestCase extends TestCase
     protected function routeUpdate(): string
     {
         return route('videos.update', ['video' => $this->model->id]);
+    }
+
+    protected function assertIfFilesUrlExists(Video $model, TestResponse $response)
+    {
+        $fileFields = Video::fileFields();
+        $data = $response->json('data');
+        $data = array_key_exists(0, $data) ? $data[0] : $data;
+        foreach ($fileFields as $field) {
+            $file = $model->{$field};
+            $this->assertEquals(
+                Storage::url($model->relativeFilePath($file)),
+                $data[sprintf('%s_url', $field)]
+            );
+        }
     }
 }

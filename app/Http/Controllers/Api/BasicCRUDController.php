@@ -3,22 +3,35 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\ResourceCollection;
 use Illuminate\Http\Response;
 use Illuminate\Validation\ValidationException;
+use ReflectionClass;
 
 abstract class BasicCRUDController extends Controller
 {
+    protected int $paginationSize = 15;
+
     protected abstract function model();
 
     protected abstract function rulesStore();
 
     protected abstract function rulesUpdate();
 
+    protected abstract function resource();
+
+    protected abstract function resourceCollection();
+
     public function index()
     {
-        return $this->model()::all();
+        $data = !$this->paginationSize ? $this->model()::all() : $this->model()::paginate($this->paginationSize);
+
+        $collectionClass = $this->resourceCollection();
+        $refClass = new ReflectionClass($this->resourceCollection());
+        return $refClass->isSubclassOf(ResourceCollection::class)
+            ? new $collectionClass($data)
+            : $collectionClass::collection($data);
     }
 
     protected function findOrFail($id)
@@ -31,27 +44,32 @@ abstract class BasicCRUDController extends Controller
     /**
      * @throws ValidationException
      */
-    public function store(Request $request): Model
+    public function store(Request $request)
     {
         $data = $this->validate($request, $this->rulesStore());
         $model = $this->model()::create($data);
-        return $model->refresh();
+        $model->refresh();
+        $resource = $this->resource();
+        return new $resource($model);
     }
 
-    public function show($id): Model
+    public function show($id)
     {
-        return $this->findOrFail($id);
+        $model = $this->findOrFail($id);
+        $resource = $this->resource();
+        return new $resource($model);
     }
 
     /**
      * @throws ValidationException
      */
-    public function update(Request $request, $id): Model
+    public function update(Request $request, $id)
     {
         $model = $this->findOrFail($id);
         $data = $this->validate($request, $this->rulesUpdate());
         $model->update($data);
-        return $model;
+        $resource = $this->resource();
+        return new $resource($model);
     }
 
     public function destroy($id): Response

@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Http\Resources\GenreResource;
 use App\Models\Genre;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
@@ -17,12 +17,11 @@ class GenreController extends BasicCRUDController
         'categories_id' => ['required', 'array', 'exists:categories,id,deleted_at,NULL'],
     ];
 
-
     /**
      * @throws Throwable
      * @throws ValidationException
      */
-    public function store(Request $request): Model
+    public function store(Request $request)
     {
         /** @var Genre $model */
         $data = $this->validate($request, $this->rulesStore());
@@ -30,7 +29,8 @@ class GenreController extends BasicCRUDController
             $model = $this->model()::create($data);
             $this->handleRelations($model, $request);
             $model->refresh();
-            return $model;
+            $resource = $this->resource();
+            return new $resource($model);
         });
     }
 
@@ -38,7 +38,7 @@ class GenreController extends BasicCRUDController
      * @throws Throwable
      * @throws ValidationException
      */
-    public function update(Request $request, $id): Model
+    public function update(Request $request, $id)
     {
         /** @var Genre $model */
         $data = $this->validate($request, $this->rulesUpdate());
@@ -46,7 +46,8 @@ class GenreController extends BasicCRUDController
             $model = $this->findOrFail($id);
             $model->update($data);
             $this->handleRelations($model, $request);
-            return $model;
+            $resource = $this->resource();
+            return new $resource($model);
         });
     }
 
@@ -72,5 +73,15 @@ class GenreController extends BasicCRUDController
     protected function handleRelations($model, Request $request): void
     {
         $model->categories()->sync($request->get('categories_id'));
+    }
+
+    protected function resourceCollection(): string
+    {
+        return $this->resource();
+    }
+
+    protected function resource(): string
+    {
+        return GenreResource::class;
     }
 }
