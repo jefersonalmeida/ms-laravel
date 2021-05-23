@@ -3,3 +3,4 @@
 .vscode/
 .history/
 .devcontainer/
+.npm-cache
