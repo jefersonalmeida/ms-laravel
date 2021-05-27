@@ -12,9 +12,8 @@ RUN apk add --no-cache git \
             libpng-dev \
             libzip-dev
 
-RUN npm config set cache /var/www/.npm-cache --global
-RUN touch /root/.bashrc | echo "PS1='\w\$ '" >> /root/.bashrc
 RUN touch /home/www-data/.bashrc | echo "PS1='\w\$ '" >> /home/www-data/.bashrc
+RUN npm config set cache /var/www/.npm-cache --global
 
 RUN docker-php-ext-install pdo pdo_mysql bcmath sockets zip
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg
