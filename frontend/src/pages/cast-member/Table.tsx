@@ -1,11 +1,13 @@
 import * as React from 'react';
 import {useEffect, useState} from 'react';
 import MUIDataTable, {MUIDataTableColumn} from 'mui-datatables';
-import {httpVideo} from '../../util/http';
 import {Chip} from '@material-ui/core';
 import format from 'date-fns/format';
 import parseISO from 'date-fns/parseISO';
 import {Mapper} from '../../util/mapper';
+import {CastMember} from '../../interfaces/cast-member';
+import castMemberResource from '../../resource/cast-member.resource';
+import {ResponseEntity} from '../../interfaces/interfaces';
 
 const columnsDefinition: MUIDataTableColumn[] = [
   {
@@ -17,7 +19,7 @@ const columnsDefinition: MUIDataTableColumn[] = [
     label: 'Tipo',
     options: {
       customBodyRender(value) {
-        const obj = Mapper.members().find(r => r.value === value);
+        const obj = Mapper.members.find(r => r.value === value);
         return <Chip
             label={obj?.label || ''}
             color={obj?.color || 'primary'}
@@ -42,10 +44,12 @@ interface TableProps {
 
 const Table = (props: TableProps) => {
 
-  const [data, setData] = useState([]);
+  const [data, setData] = useState<CastMember[]>([]);
 
   useEffect(() => {
-    httpVideo.get('cast-members').then(response => setData(response.data.data));
+    castMemberResource
+        .list<ResponseEntity<CastMember[]>>()
+        .then(({data}) => setData(data.data));
   }, []);
 
   return (

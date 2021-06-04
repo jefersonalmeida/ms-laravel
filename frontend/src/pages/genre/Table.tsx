@@ -1,11 +1,13 @@
 import * as React from 'react';
 import {useEffect, useState} from 'react';
 import MUIDataTable, {MUIDataTableColumn} from 'mui-datatables';
-import {httpVideo} from '../../util/http';
 import {Chip} from '@material-ui/core';
 import format from 'date-fns/format';
 import parseISO from 'date-fns/parseISO';
 import {Mapper} from '../../util/mapper';
+import genreResource from '../../resource/genre.resource';
+import {Genre} from '../../interfaces/genre';
+import {ResponseEntity} from '../../interfaces/interfaces';
 
 const columnsDefinition: MUIDataTableColumn[] = [
   {
@@ -26,7 +28,7 @@ const columnsDefinition: MUIDataTableColumn[] = [
     label: 'Ativo?',
     options: {
       customBodyRender(value) {
-        const obj = Mapper.actives().find(r => r.value === value);
+        const obj = Mapper.actives.find(r => r.value === value);
         return <Chip
             label={obj?.label || ''}
             color={obj?.color || 'primary'}
@@ -51,10 +53,12 @@ interface TableProps {
 
 const Table = (props: TableProps) => {
 
-  const [data, setData] = useState([]);
+  const [data, setData] = useState<Genre[]>([]);
 
   useEffect(() => {
-    httpVideo.get('genres').then(response => setData(response.data.data));
+    genreResource
+        .list<ResponseEntity<Genre[]>>()
+        .then(({data}) => setData(data.data));
   }, []);
 
   return (

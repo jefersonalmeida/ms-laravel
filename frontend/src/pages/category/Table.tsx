@@ -1,11 +1,13 @@
 import * as React from 'react';
 import {useEffect, useState} from 'react';
 import MUIDataTable, {MUIDataTableColumn} from 'mui-datatables';
-import {httpVideo} from '../../util/http';
 import {Chip} from '@material-ui/core';
 import format from 'date-fns/format';
 import parseISO from 'date-fns/parseISO';
 import {Mapper} from '../../util/mapper';
+import categoryResource from '../../resource/category.resource';
+import {Category} from '../../interfaces/category';
+import {ResponseEntity} from '../../interfaces/interfaces';
 
 const columnsDefinition: MUIDataTableColumn[] = [
   {
@@ -17,7 +19,7 @@ const columnsDefinition: MUIDataTableColumn[] = [
     label: 'Ativo?',
     options: {
       customBodyRender(value) {
-        const obj = Mapper.actives().find(r => r.value === value);
+        const obj = Mapper.actives.find(r => r.value === value);
         return <Chip
             label={obj?.label || ''}
             color={obj?.color || 'primary'}
@@ -42,10 +44,12 @@ interface TableProps {
 
 const Table = (props: TableProps) => {
 
-  const [data, setData] = useState([]);
+  const [data, setData] = useState<Category[]>([]);
 
   useEffect(() => {
-    httpVideo.get('categories').then(response => setData(response.data.data));
+    categoryResource
+        .list<ResponseEntity<Category[]>>()
+        .then(({data}) => setData(data.data));
   }, []);
 
   return (

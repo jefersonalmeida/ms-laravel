@@ -1,5 +1,5 @@
 import axios from 'axios';
 
-export const httpVideo = axios.create({
+export const resourceVideo = axios.create({
   baseURL: process.env.REACT_APP_MICRO_VIDEO_ENDPOINT_API,
 });
