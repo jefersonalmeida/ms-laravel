@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 #On error no such file entrypoint.sh, execute in terminal - dos2unix .docker\entrypoint.sh
 
