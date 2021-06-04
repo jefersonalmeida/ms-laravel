@@ -3,6 +3,8 @@ import {useEffect, useState} from 'react';
 import MUIDataTable, {MUIDataTableColumn} from 'mui-datatables';
 import {httpVideo} from '../../util/http';
 import {Chip} from '@material-ui/core';
+import format from 'date-fns/format';
+import parseISO from 'date-fns/parseISO';
 
 const columnsDefinition: MUIDataTableColumn[] = [
   {
@@ -13,7 +15,7 @@ const columnsDefinition: MUIDataTableColumn[] = [
     name: 'is_active',
     label: 'Ativo?',
     options: {
-      customBodyRender(value, tableMeta, updateValue) {
+      customBodyRender(value) {
         return <Chip label={value ? 'Sim' : 'Não'}
                      color={value ? 'primary' : 'secondary'}
         />;
@@ -23,6 +25,11 @@ const columnsDefinition: MUIDataTableColumn[] = [
   {
     name: 'created_at',
     label: 'Criado em',
+    options: {
+      customBodyRender(value) {
+        return <span>{format(parseISO(value), 'dd/mm/yyyy')}</span>;
+      },
+    },
   },
 ];
 
