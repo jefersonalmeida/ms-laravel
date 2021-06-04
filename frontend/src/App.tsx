@@ -10,7 +10,7 @@ const App = () => (
     <React.Fragment>
       <BrowserRouter>
         <Navbar/>
-        <Box paddingTop={'90px'}>
+        <Box paddingTop={'70px'}>
           <Breadcrumbs/>
           <AppRouter/>
         </Box>
