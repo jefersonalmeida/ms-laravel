@@ -13,11 +13,11 @@ const columnsDefinition: MUIDataTableColumn[] = [
     label: 'Nome',
   },
   {
-    name: 'is_active',
-    label: 'Ativo?',
+    name: 'type',
+    label: 'Tipo',
     options: {
       customBodyRender(value) {
-        const obj = Mapper.actives().find(r => r.value === value);
+        const obj = Mapper.members().find(r => r.value === value);
         return <Chip
             label={obj?.label || ''}
             color={obj?.color || 'primary'}
@@ -45,7 +45,7 @@ const Table = (props: TableProps) => {
   const [data, setData] = useState([]);
 
   useEffect(() => {
-    httpVideo.get('categories').then(response => setData(response.data.data));
+    httpVideo.get('cast-members').then(response => setData(response.data.data));
   }, []);
 
   return (

@@ -4,7 +4,7 @@ import {IconButton, Menu as MuiMenu, MenuItem} from '@material-ui/core';
 import routes, {MyRouteProps} from '../../routes';
 import {Link} from 'react-router-dom';
 
-const listRoutes = ['dashboard', 'categories.list'];
+const listRoutes = ['dashboard', 'categories.list', 'genres.list', 'cast-members.list'];
 const menuRoutes = routes.filter(r => listRoutes.includes(r.name));
 
 const Menu = () => {

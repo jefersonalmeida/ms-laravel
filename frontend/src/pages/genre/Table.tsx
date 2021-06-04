@@ -13,6 +13,15 @@ const columnsDefinition: MUIDataTableColumn[] = [
     label: 'Nome',
   },
   {
+    name: 'categories',
+    label: 'Categorias',
+    options: {
+      customBodyRender(value) {
+        return value.map((r: any) => r.name).join(', ');
+      },
+    },
+  },
+  {
     name: 'is_active',
     label: 'Ativo?',
     options: {
@@ -45,7 +54,7 @@ const Table = (props: TableProps) => {
   const [data, setData] = useState([]);
 
   useEffect(() => {
-    httpVideo.get('categories').then(response => setData(response.data.data));
+    httpVideo.get('genres').then(response => setData(response.data.data));
   }, []);
 
   return (
