@@ -8,7 +8,6 @@ import {
 } from '@material-ui/core';
 import {makeStyles, Theme} from '@material-ui/core/styles';
 import {SubmitHandler, useForm} from 'react-hook-form';
-import {Category} from '../../interfaces/category';
 import categoryResource from '../../resource/category.resource';
 
 const useStyles = makeStyles((theme: Theme) => {
@@ -29,12 +28,15 @@ const Form = () => {
     size: 'medium',
   };
 
-  const {register, handleSubmit, setValue, getValues} = useForm<Category>({
+  const {register, handleSubmit, setValue, getValues} = useForm<any>({
     defaultValues: {
-      is_active: true
-    }
+      is_active: true,
+    },
   });
-  const onSubmit: SubmitHandler<Category> = (data, event) => {
+
+  const handleChange = () => setValue('is_active', !getValues('is_active'));
+
+  const onSubmit: SubmitHandler<any> = (data, event) => {
     categoryResource.create(data)
         .then(response => console.log(response));
   };
@@ -59,7 +61,7 @@ const Form = () => {
         <Checkbox
             defaultChecked
             {...register('is_active')}
-            onChange={() => setValue('is_active', !getValues('is_active'))}
+            onChange={handleChange}
         />
         Ativo?
         <Box dir={'rtl'}>

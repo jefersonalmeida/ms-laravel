@@ -8,4 +8,5 @@ export interface Genre {
   updated_at: Date;
   deleted_at?: any;
   categories: Category[];
+  categories_id: string[];
 }
