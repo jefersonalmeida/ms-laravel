@@ -24,8 +24,8 @@ const Form = () => {
 
   const buttonProps: ButtonProps = {
     className: classes.submit,
-    variant: 'outlined',
-    size: 'medium',
+    color: 'secondary',
+    variant: 'contained',
   };
 
   const {register, handleSubmit, setValue, getValues} = useForm<any>({
@@ -59,6 +59,7 @@ const Form = () => {
             margin={'normal'}
         />
         <Checkbox
+            color={'primary'}
             defaultChecked
             {...register('is_active')}
             onChange={handleChange}
@@ -66,6 +67,7 @@ const Form = () => {
         Ativo?
         <Box dir={'rtl'}>
           <Button
+              color={'primary'}
               {...buttonProps}
               onClick={() => onSubmit(getValues())}
           >

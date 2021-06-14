@@ -4,8 +4,13 @@ import {IconButton, Menu as MuiMenu, MenuItem} from '@material-ui/core';
 import routes, {MyRouteProps} from '../../routes';
 import {Link} from 'react-router-dom';
 
-const listRoutes = ['dashboard', 'categories.list', 'genres.list', 'cast-members.list'];
-const menuRoutes = routes.filter(r => listRoutes.includes(r.name));
+const listRoutes: any = {
+  'dashboard': 'Dashboard',
+  'categories.list': 'Categorias',
+  'cast-members.list': 'Membros de elenco',
+  'genres.list': 'Gêneros',
+};
+const menuRoutes = routes.filter(r => Object.keys(listRoutes).includes(r.name));
 
 const Menu = () => {
 
@@ -37,7 +42,7 @@ const Menu = () => {
             getContentAnchorEl={null}
         >
           {
-            listRoutes.map((routeName, key) => {
+            Object.keys(listRoutes).map((routeName, key) => {
               const route = menuRoutes.find(
                   route => route.name === routeName) as MyRouteProps;
               return (
@@ -46,7 +51,7 @@ const Menu = () => {
                             to={route.path as string}
                             onClick={handleClose}
                   >
-                    {route.label}
+                    {listRoutes[routeName]}
                   </MenuItem>
               );
             })

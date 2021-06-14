@@ -29,8 +29,8 @@ const Form = () => {
 
   const buttonProps: ButtonProps = {
     className: classes.submit,
-    variant: 'outlined',
-    size: 'medium',
+    color: 'secondary',
+    variant: 'contained',
   };
 
   const [categories, setCategories] = useState<Category[]>([]);
