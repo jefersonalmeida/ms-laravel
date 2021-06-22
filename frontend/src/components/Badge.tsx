@@ -28,7 +28,6 @@ export const BadgeActive = (props: BadgeProps) => {
 };
 
 export const BadgeMember = (props: BadgeProps) => {
-  console.log(props);
   const obj = Mapper.members.find(r => r.value === props.obj.value);
   return (
       <MuiThemeProvider theme={badgeTheme}>
