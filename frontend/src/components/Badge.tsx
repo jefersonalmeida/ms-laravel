@@ -1,7 +1,7 @@
 import * as React from 'react';
-import {Mapper} from '../util/mapper';
 import {Chip, createMuiTheme, MuiThemeProvider} from '@material-ui/core';
 import theme from '../theme';
+import {DataObject} from '../interfaces/interfaces';
 
 const badgeTheme = createMuiTheme({
   palette: {
@@ -10,30 +10,12 @@ const badgeTheme = createMuiTheme({
   },
 });
 
-interface BadgeProps {
-  obj: any;
-}
-
-export const BadgeActive = (props: BadgeProps) => {
-  console.log(props);
-  const obj = Mapper.actives.find(r => r.value === props.obj.value);
+export const Badge = (props: DataObject) => {
   return (
       <MuiThemeProvider theme={badgeTheme}>
         <Chip
-            label={obj?.label || ''}
-            color={obj?.color || 'primary'}
-        />
-      </MuiThemeProvider>
-  );
-};
-
-export const BadgeMember = (props: BadgeProps) => {
-  const obj = Mapper.members.find(r => r.value === props.obj.value);
-  return (
-      <MuiThemeProvider theme={badgeTheme}>
-        <Chip
-            label={obj?.label || ''}
-            color={obj?.color || 'primary'}
+            label={props?.value?.label || ''}
+            color={props?.value?.color || 'primary'}
         />
       </MuiThemeProvider>
   );

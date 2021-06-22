@@ -3,11 +3,11 @@ import {useEffect, useState} from 'react';
 import MUIDataTable, {MUIDataTableColumn} from 'mui-datatables';
 import format from 'date-fns/format';
 import parseISO from 'date-fns/parseISO';
-import {Mapper} from '../../util/mapper';
 import categoryResource from '../../resource/category.resource';
 import {Category} from '../../interfaces/category';
 import {ResponseEntity} from '../../interfaces/interfaces';
-import {BadgeActive} from '../../components/Badge';
+import {Badge} from '../../components/Badge';
+import {Mapper} from '../../util/mapper';
 
 const columnsDefinition: MUIDataTableColumn[] = [
   {
@@ -20,7 +20,7 @@ const columnsDefinition: MUIDataTableColumn[] = [
     options: {
       customBodyRender(value) {
         const obj = Mapper.actives.find(r => r.value === value);
-        return <BadgeActive obj={obj}/>;
+        return <Badge value={obj}/>;
       },
     },
   },
