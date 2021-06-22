@@ -1,5 +1,6 @@
 import {createMuiTheme, SimplePaletteColorOptions} from '@material-ui/core';
 import {PaletteOptions} from '@material-ui/core/styles/createPalette';
+import {green, red} from '@material-ui/core/colors';
 
 const palette: PaletteOptions = {
   primary: {
@@ -12,6 +13,14 @@ const palette: PaletteOptions = {
   },
   background: {
     default: '#FAFAFA',
+  },
+  success: {
+    main: green['500'],
+    contrastText: '#FFFFFF',
+  },
+  error: {
+    main: red['500'],
+    contrastText: '#FFFFFF',
   },
 };
 const theme = createMuiTheme({
@@ -98,8 +107,8 @@ const theme = createMuiTheme({
     MUIDataTablePagination: {
       root: {
         color: (palette!.primary as SimplePaletteColorOptions).main,
-      }
-    }
+      },
+    },
   },
 });
 

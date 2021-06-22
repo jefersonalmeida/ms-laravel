@@ -1,13 +1,13 @@
 import * as React from 'react';
 import {useEffect, useState} from 'react';
 import MUIDataTable, {MUIDataTableColumn} from 'mui-datatables';
-import {Chip} from '@material-ui/core';
 import format from 'date-fns/format';
 import parseISO from 'date-fns/parseISO';
 import {Mapper} from '../../util/mapper';
 import genreResource from '../../resource/genre.resource';
 import {Genre} from '../../interfaces/genre';
 import {ResponseEntity} from '../../interfaces/interfaces';
+import {BadgeActive} from '../../components/Badge';
 
 const columnsDefinition: MUIDataTableColumn[] = [
   {
@@ -29,10 +29,7 @@ const columnsDefinition: MUIDataTableColumn[] = [
     options: {
       customBodyRender(value) {
         const obj = Mapper.actives.find(r => r.value === value);
-        return <Chip
-            label={obj?.label || ''}
-            color={obj?.color || 'primary'}
-        />;
+        return <BadgeActive obj={obj}/>;
       },
     },
   },
