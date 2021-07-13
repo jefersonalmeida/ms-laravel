@@ -1,14 +1,21 @@
 import * as React from 'react';
+import { useEffect, useState } from 'react';
 import {
   Box,
   Button,
   ButtonProps,
   Checkbox,
+  FormControlLabel,
   TextField,
 } from '@material-ui/core';
-import {makeStyles, Theme} from '@material-ui/core/styles';
-import {SubmitHandler, useForm} from 'react-hook-form';
+import { makeStyles, Theme } from '@material-ui/core/styles';
+import { useForm } from 'react-hook-form';
 import categoryResource from '../../resource/category.resource';
+import * as yup from 'yup';
+import { yupResolver } from '@hookform/resolvers/yup';
+import { useHistory, useParams } from 'react-router';
+import { useSnackbar } from 'notistack';
+import { Category } from '../../interfaces/category';
 
 const useStyles = makeStyles((theme: Theme) => {
   return {
@@ -18,64 +25,156 @@ const useStyles = makeStyles((theme: Theme) => {
   };
 });
 
+const validationSchema = yup.object().shape({
+  name: yup.string()
+      .required(),
+});
+
 const Form = () => {
 
-  const classes = useStyles();
-
-  const buttonProps: ButtonProps = {
-    className: classes.submit,
-    color: 'secondary',
-    variant: 'contained',
-  };
-
-  const {register, handleSubmit, setValue, getValues} = useForm<any>({
+  const {
+    register,
+    handleSubmit,
+    getValues,
+    setValue,
+    formState: { errors },
+    reset,
+    watch,
+  } = useForm<Category>({
+    resolver: yupResolver(validationSchema),
     defaultValues: {
       is_active: true,
     },
   });
 
-  const handleChange = () => setValue('is_active', !getValues('is_active'));
+  const classes = useStyles();
+  const snackbar = useSnackbar();
+  const history = useHistory();
+  const { id } = useParams<any>();
+  const [entity, setEntity] = useState<Category | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
 
-  const onSubmit: SubmitHandler<any> = (data, event) => {
-    categoryResource.create(data)
-        .then(response => console.log(response));
+  const buttonProps: ButtonProps = {
+    className: classes.submit,
+    color: 'secondary',
+    variant: 'contained',
+    disabled: loading,
   };
 
+  useEffect(() => {
+    if (!id) {
+      return;
+    }
+
+    (async function getEntity() {
+      setLoading(true);
+      try {
+        const { data } = await categoryResource.get(id);
+        setEntity(data.data);
+        reset(data.data);
+
+      } catch (e) {
+        console.error(e);
+        snackbar.enqueueSnackbar(
+            `não foi possível carregar as informações`,
+            { variant: 'error' },
+        );
+      } finally {
+        setLoading(false);
+      }
+    })();
+
+  }, [id, reset, snackbar]);
+
+  useEffect(() => {
+    register('is_active');
+  }, [register]);
+
+  async function onSubmit(formData: any, event: any) {
+    setLoading(true);
+
+    try {
+
+      const { data } = !entity
+          ? await categoryResource.create(formData)
+          : await categoryResource.update(entity.id, formData);
+
+      snackbar.enqueueSnackbar(
+          `${ data.data.name } salva com sucesso!`,
+          { variant: 'success' },
+      );
+
+      setTimeout(() => {
+        event
+            ? (
+                id ? history.replace(`/categories/${ data.data.id }/edit`)
+                    : history.push(`/categories/${ data.data.id }/edit`)
+            )
+            : history.push('/categories');
+      });
+    } catch (e) {
+      console.log(e);
+      snackbar.enqueueSnackbar(
+          `Erro ao processar a solicitação`,
+          { variant: 'error' },
+      );
+    } finally {
+      setLoading(false);
+    }
+  }
+
   return (
-      <form onSubmit={handleSubmit(onSubmit)}>
+      <form onSubmit={ handleSubmit(onSubmit) }>
         <TextField
-            {...register('name')}
-            label={'Nome'}
+            { ...register('name') }
+            name={ 'name' }
+            label={ 'Nome' }
             fullWidth
-            variant={'outlined'}
+            variant={ 'outlined' }
+            disabled={ loading }
+            error={ errors?.name !== undefined }
+            helperText={ errors?.name?.message }
+            InputLabelProps={ { shrink: true } }
         />
         <TextField
-            {...register('description')}
-            label={'Descrição'}
+            { ...register('description') }
+            name={ 'description' }
+            label={ 'Descrição' }
+            fullWidth
+            variant={ 'outlined' }
+            margin={ 'normal' }
             multiline
-            rows={3}
-            fullWidth
-            variant={'outlined'}
-            margin={'normal'}
+            rows={ 3 }
+            disabled={ loading }
+            InputLabelProps={ { shrink: true } }
         />
-        <Checkbox
-            color={'primary'}
-            defaultChecked
-            {...register('is_active')}
-            onChange={handleChange}
+        <FormControlLabel
+            disabled={ loading }
+            name={ 'is_active' }
+            label={ 'Ativo?' }
+            labelPlacement={ 'end' }
+            control={
+              <Checkbox
+                  name={ 'is_active' }
+                  color={ 'primary' }
+                  checked={ watch('is_active') }
+                  onChange={
+                    () => setValue('is_active', !getValues('is_active'))
+                  }
+              />
+            }
         />
-        Ativo?
-        <Box dir={'rtl'}>
+
+        <Box dir={ 'rtl' }>
           <Button
-              color={'primary'}
-              {...buttonProps}
-              onClick={() => onSubmit(getValues())}
+              color={ 'primary' }
+              { ...buttonProps }
+              onClick={ () => onSubmit(getValues(), null) }
           >
             Salvar
           </Button>
-          <Button
-              {...buttonProps}
-              type={'submit'}
+          <Button{ ...buttonProps }
+                 type={ 'submit' }
           >
             Salvar e continuar
           </Button>

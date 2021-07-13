@@ -1,13 +1,13 @@
 import * as React from 'react';
-import {useEffect, useState} from 'react';
-import MUIDataTable, {MUIDataTableColumn} from 'mui-datatables';
+import { useEffect, useState } from 'react';
+import MUIDataTable, { MUIDataTableColumn } from 'mui-datatables';
 import format from 'date-fns/format';
 import parseISO from 'date-fns/parseISO';
 import categoryResource from '../../resource/category.resource';
-import {Category} from '../../interfaces/category';
-import {ResponseEntity} from '../../interfaces/interfaces';
-import {Badge} from '../../components/Badge';
-import {Mapper} from '../../util/mapper';
+import { Category } from '../../interfaces/category';
+import { ResponseList } from '../../interfaces/interfaces';
+import { Badge } from '../../components/Badge';
+import { Mapper } from '../../util/mapper';
 
 const columnsDefinition: MUIDataTableColumn[] = [
   {
@@ -20,7 +20,7 @@ const columnsDefinition: MUIDataTableColumn[] = [
     options: {
       customBodyRender(value) {
         const obj = Mapper.actives.find(r => r.value === value);
-        return <Badge value={obj}/>;
+        return <Badge value={ obj }/>;
       },
     },
   },
@@ -29,31 +29,35 @@ const columnsDefinition: MUIDataTableColumn[] = [
     label: 'Criado em',
     options: {
       customBodyRender(value) {
-        return <span>{format(parseISO(value), 'dd/mm/yyyy')}</span>;
+        return <span>{ format(parseISO(value), 'dd/mm/yyyy') }</span>;
       },
     },
   },
 ];
 
-interface TableProps {
-
-}
-
-const Table = (props: TableProps) => {
+const Table = () => {
 
   const [data, setData] = useState<Category[]>([]);
 
   useEffect(() => {
-    categoryResource
-        .list<ResponseEntity<Category[]>>()
-        .then(({data}) => setData(data.data));
+    let isSubscribed = true;
+    (async function list() {
+      const { data } = await categoryResource.list<ResponseList<Category>>();
+      if (isSubscribed) {
+        setData(data.data);
+      }
+    })();
+
+    return () => {
+      isSubscribed = false;
+    };
   }, []);
 
   return (
       <MUIDataTable
           title=""
-          columns={columnsDefinition}
-          data={data}
+          columns={ columnsDefinition }
+          data={ data }
       />
   );
 };

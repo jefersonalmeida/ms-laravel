@@ -1,11 +1,10 @@
-export interface Category {
-  id: string;
+import { Timestamps } from './interfaces';
+
+export interface Category extends Timestamps {
+  readonly id: string;
   is_active: boolean;
   name: string;
   description?: any;
-  created_at: Date;
-  updated_at: Date;
-  deleted_at?: any;
   pivot?: PivotGenreCategory;
 }
 

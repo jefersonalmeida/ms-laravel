@@ -1,12 +1,10 @@
-import {Category} from './category';
+import { Category } from './category';
+import { Timestamps } from './interfaces';
 
-export interface Genre {
-  id: string;
+export interface Genre extends Timestamps {
+  readonly id: string;
   is_active: boolean;
   name: string;
-  created_at: Date;
-  updated_at: Date;
-  deleted_at?: any;
   categories: Category[];
-  categories_id: string[];
+  categories_id: string | any[] | undefined;
 }

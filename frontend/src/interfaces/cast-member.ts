@@ -1,8 +1,7 @@
-export interface CastMember {
-  id: string;
+import { Timestamps } from './interfaces';
+
+export interface CastMember extends Timestamps {
+  readonly id: string;
   name: string;
   type: number;
-  created_at: Date;
-  updated_at: Date;
-  deleted_at?: any;
 }
