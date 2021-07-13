@@ -1,14 +1,6 @@
 import * as React from 'react';
 import { useEffect, useState } from 'react';
-import {
-  Box,
-  Button,
-  ButtonProps,
-  Checkbox,
-  MenuItem,
-  TextField,
-} from '@material-ui/core';
-import { makeStyles, Theme } from '@material-ui/core/styles';
+import { Checkbox, MenuItem, TextField } from '@material-ui/core';
 import { useForm } from 'react-hook-form';
 import genreResource from '../../resource/genre.resource';
 import { Category } from '../../interfaces/category';
@@ -18,14 +10,8 @@ import { useSnackbar } from 'notistack';
 import { useHistory, useParams } from 'react-router';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Genre } from '../../interfaces/genre';
-
-const useStyles = makeStyles((theme: Theme) => {
-  return {
-    submit: {
-      margin: theme.spacing(1),
-    },
-  };
-});
+import SubmitActions from '../../components/SubmitActions';
+import DefaultForm from '../../components/DefaultForm';
 
 const validationSchema = yup.object().shape({
   name: yup.string()
@@ -46,6 +32,7 @@ const Form = () => {
     formState: { errors },
     reset,
     watch,
+    trigger,
   } = useForm<Genre>({
     resolver: yupResolver(validationSchema),
     defaultValues: {
@@ -54,20 +41,12 @@ const Form = () => {
     },
   });
 
-  const classes = useStyles();
   const snackbar = useSnackbar();
   const history = useHistory();
   const { id } = useParams<any>();
   const [entity, setEntity] = useState<Genre | null>(null);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
-
-  const buttonProps: ButtonProps = {
-    className: classes.submit,
-    color: 'secondary',
-    variant: 'contained',
-    disabled: loading,
-  };
 
   useEffect(() => {
     let isSubscribed = true;
@@ -147,7 +126,7 @@ const Form = () => {
   }
 
   return (
-      <form onSubmit={ handleSubmit(onSubmit) }>
+      <DefaultForm onSubmit={ handleSubmit(onSubmit) } GridItemProps={{xs: 12, md: 6}}>
         <TextField
             { ...register('name') }
             label={ 'Nome' }
@@ -171,7 +150,8 @@ const Form = () => {
             SelectProps={ { multiple: true } }
             disabled={ loading }
             error={ errors?.categories_id !== undefined }
-            helperText={ errors?.categories_id && errors.categories_id?.message }
+            helperText={ errors?.categories_id &&
+            errors.categories_id?.message }
             InputLabelProps={ { shrink: true } }
         >
           <MenuItem value={ '' } disabled>Selecione as categorias</MenuItem>
@@ -190,15 +170,16 @@ const Form = () => {
             onChange={ () => setValue('is_active', !getValues('is_active')) }
         />
         Ativo?
-        <Box dir={ 'rtl' }>
-          <Button{ ...buttonProps }
-                 onClick={ () => onSubmit(getValues(), null) }>
-            Salvar
-          </Button>
-          <Button{ ...buttonProps } type={ 'submit' }>Salvar e
-            continuar</Button>
-        </Box>
-      </form>
+        <SubmitActions
+            disabledButtons={ loading }
+            handleSave={ () =>
+                trigger().then(isValid => {
+                      isValid && onSubmit(getValues(), null);
+                    },
+                )
+            }
+        />
+      </DefaultForm>
   );
 };
 export default Form;

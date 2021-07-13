@@ -1,14 +1,6 @@
 import * as React from 'react';
 import { useEffect, useState } from 'react';
-import {
-  Box,
-  Button,
-  ButtonProps,
-  Checkbox,
-  FormControlLabel,
-  TextField,
-} from '@material-ui/core';
-import { makeStyles, Theme } from '@material-ui/core/styles';
+import { Checkbox, FormControlLabel, TextField } from '@material-ui/core';
 import { useForm } from 'react-hook-form';
 import categoryResource from '../../resource/category.resource';
 import * as yup from 'yup';
@@ -16,14 +8,8 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { useHistory, useParams } from 'react-router';
 import { useSnackbar } from 'notistack';
 import { Category } from '../../interfaces/category';
-
-const useStyles = makeStyles((theme: Theme) => {
-  return {
-    submit: {
-      margin: theme.spacing(1),
-    },
-  };
-});
+import SubmitActions from '../../components/SubmitActions';
+import DefaultForm from '../../components/DefaultForm';
 
 const validationSchema = yup.object().shape({
   name: yup.string()
@@ -40,6 +26,7 @@ const Form = () => {
     formState: { errors },
     reset,
     watch,
+    trigger,
   } = useForm<Category>({
     resolver: yupResolver(validationSchema),
     defaultValues: {
@@ -47,19 +34,11 @@ const Form = () => {
     },
   });
 
-  const classes = useStyles();
   const snackbar = useSnackbar();
   const history = useHistory();
   const { id } = useParams<any>();
   const [entity, setEntity] = useState<Category | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
-
-  const buttonProps: ButtonProps = {
-    className: classes.submit,
-    color: 'secondary',
-    variant: 'contained',
-    disabled: loading,
-  };
 
   useEffect(() => {
     if (!id) {
@@ -124,7 +103,7 @@ const Form = () => {
   }
 
   return (
-      <form onSubmit={ handleSubmit(onSubmit) }>
+      <DefaultForm onSubmit={ handleSubmit(onSubmit) } GridItemProps={{xs: 12, md: 6}}>
         <TextField
             { ...register('name') }
             name={ 'name' }
@@ -164,22 +143,16 @@ const Form = () => {
               />
             }
         />
-
-        <Box dir={ 'rtl' }>
-          <Button
-              color={ 'primary' }
-              { ...buttonProps }
-              onClick={ () => onSubmit(getValues(), null) }
-          >
-            Salvar
-          </Button>
-          <Button{ ...buttonProps }
-                 type={ 'submit' }
-          >
-            Salvar e continuar
-          </Button>
-        </Box>
-      </form>
+        <SubmitActions
+            disabledButtons={ loading }
+            handleSave={ () =>
+                trigger().then(isValid => {
+                      isValid && onSubmit(getValues(), null);
+                    },
+                )
+            }
+        />
+      </DefaultForm>
   );
 };
 export default Form;
