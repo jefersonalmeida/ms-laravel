@@ -5,7 +5,7 @@ import MUIDataTable, {
     MUIDataTableProps,
 } from 'mui-datatables';
 import * as _ from 'lodash';
-import { MuiThemeProvider, useTheme } from '@material-ui/core';
+import { MuiThemeProvider, useMediaQuery, useTheme } from '@material-ui/core';
 import { Theme } from '@material-ui/core/styles';
 
 const defaultOptions: MUIDataTableOptions = {
@@ -79,11 +79,17 @@ const Table: React.FC<TableProps> = (props) => {
             : textLabels.body.noMatch;
     }
 
+    function applyResponsive() {
+        newProps.options.responsive = isSmOrDown ? 'vertical' : 'standard';
+    }
+
     function getOriginalMuiDataTableProps() {
         return _.omit(newProps, 'loading');
     }
 
     const theme = _.cloneDeep<Theme>(useTheme());
+    const isSmOrDown = useMediaQuery(theme.breakpoints.down('sm'));
+    console.log(isSmOrDown);
 
     const newProps = _.merge(
         { options: _.cloneDeep(defaultOptions) },
@@ -92,6 +98,7 @@ const Table: React.FC<TableProps> = (props) => {
     );
 
     applyLoading();
+    applyResponsive();
 
     const originalProps = getOriginalMuiDataTableProps();
 
