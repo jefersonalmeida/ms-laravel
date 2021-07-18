@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { useEffect, useState } from 'react';
-import { MUIDataTableColumn } from 'mui-datatables';
 import format from 'date-fns/format';
 import parseISO from 'date-fns/parseISO';
 import genreResource from '../../resource/genre.resource';
@@ -8,67 +7,98 @@ import { Genre } from '../../interfaces/genre';
 import { ResponseList } from '../../interfaces/interfaces';
 import { Badge } from '../../components/Badge';
 import { Mapper } from '../../util/mapper';
-import DefaultTable from '../../components/Table';
+import DefaultTable, { TableColumn } from '../../components/Table';
+import { useSnackbar } from 'notistack';
 
-const columnsDefinition: MUIDataTableColumn[] = [
-  {
-    name: 'name',
-    label: 'Nome',
-  },
-  {
-    name: 'categories',
-    label: 'Categorias',
-    options: {
-      customBodyRender(value) {
-        return value.map((r: any) => r.name).join(', ');
-      },
+const columnsDefinition: TableColumn[] = [
+    {
+        name: 'id',
+        label: 'ID',
+        options: {
+            sort: false,
+        },
+        width: '30%',
     },
-  },
-  {
-    name: 'is_active',
-    label: 'Ativo?',
-    options: {
-      customBodyRender(value) {
-        const obj = Mapper.actives.find(r => r.value === value);
-        return <Badge value={ obj }/>;
-      },
+    {
+        name: 'name',
+        label: 'Nome',
+        width: '20%',
     },
-  },
-  {
-    name: 'created_at',
-    label: 'Criado em',
-    options: {
-      customBodyRender(value) {
-        return <span>{ format(parseISO(value), 'dd/mm/yyyy') }</span>;
-      },
+    {
+        name: 'categories',
+        label: 'Categorias',
+        options: {
+            customBodyRender(value) {
+                return value.map((r: any) => r.name).join(', ');
+            },
+        },
+        width: '20%',
     },
-  },
+    {
+        name: 'is_active',
+        label: 'Ativo?',
+        options: {
+            customBodyRender(value) {
+                const obj = Mapper.actives.find(r => r.value === value);
+                return <Badge value={ obj }/>;
+            },
+        },
+        width: '7%',
+    },
+    {
+        name: 'created_at',
+        label: 'Criado em',
+        options: {
+            customBodyRender(value) {
+                return <span>{ format(parseISO(value), 'dd/mm/yyyy') }</span>;
+            },
+        },
+        width: '10%',
+    },
+    {
+        name: 'actions',
+        label: 'Ações',
+        width: '13%',
+    },
 ];
 
 const Table = () => {
+    const snackbar = useSnackbar();
+    const [data, setData] = useState<Genre[]>([]);
+    const [loading, setLoading] = useState<boolean>(false);
 
-  const [data, setData] = useState<Genre[]>([]);
+    useEffect(() => {
+        let isSubscribed = true;
+        (async () => {
+            setLoading(true);
+            try {
+                const { data } = await genreResource.list<ResponseList<Genre>>();
+                if (isSubscribed) {
+                    setData(data.data);
+                }
+            } catch (e) {
+                console.error(e);
+                snackbar.enqueueSnackbar(
+                    `não foi possível carregar as informações`,
+                    { variant: 'error' },
+                );
+            } finally {
+                setLoading(false);
+            }
+        })();
 
-  useEffect(() => {
-    let isSubscribed = true;
-    (async function list() {
-      const { data } = await genreResource.list<ResponseList<Genre>>();
-      if (isSubscribed) {
-        setData(data.data);
-      }
-    })();
+        return () => {
+            isSubscribed = false;
+        };
+    }, [snackbar]);
 
-    return () => {
-      isSubscribed = false;
-    };
-  }, []);
-
-  return (
-      <DefaultTable
-          title=""
-          columns={ columnsDefinition }
-          data={ data }
-      />
-  );
+    return (
+        <DefaultTable
+            title=""
+            columns={ columnsDefinition }
+            data={ data }
+            loading={ loading }
+        />
+    );
 };
 export default Table;
