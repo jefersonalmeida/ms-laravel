@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useEffect, useState } from 'react';
-import MUIDataTable, { MUIDataTableColumn } from 'mui-datatables';
+import { MUIDataTableColumn } from 'mui-datatables';
 import format from 'date-fns/format';
 import parseISO from 'date-fns/parseISO';
 import genreResource from '../../resource/genre.resource';
@@ -8,6 +8,7 @@ import { Genre } from '../../interfaces/genre';
 import { ResponseList } from '../../interfaces/interfaces';
 import { Badge } from '../../components/Badge';
 import { Mapper } from '../../util/mapper';
+import DefaultTable from '../../components/Table';
 
 const columnsDefinition: MUIDataTableColumn[] = [
   {
@@ -63,7 +64,7 @@ const Table = () => {
   }, []);
 
   return (
-      <MUIDataTable
+      <DefaultTable
           title=""
           columns={ columnsDefinition }
           data={ data }
