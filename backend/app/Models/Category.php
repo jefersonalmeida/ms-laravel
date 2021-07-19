@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
+use App\ModelFilters\CategoryFilter;
 use App\Models\Traits\Uuid;
+use EloquentFilter\Filterable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -15,6 +17,7 @@ class Category extends Model
     use HasFactory;
     use SoftDeletes;
     use Uuid;
+    use Filterable;
 
     public $incrementing = false;
 
@@ -35,4 +38,9 @@ class Category extends Model
         'is_active' => 'boolean',
         'deleted_at' => 'datetime',
     ];
+
+    public function modelFilter(): ?string
+    {
+        return $this->provideFilter(CategoryFilter::class);
+    }
 }

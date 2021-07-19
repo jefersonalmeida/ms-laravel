@@ -89,7 +89,6 @@ const Table: React.FC<TableProps> = (props) => {
 
     const theme = _.cloneDeep<Theme>(useTheme());
     const isSmOrDown = useMediaQuery(theme.breakpoints.down('sm'));
-    console.log(isSmOrDown);
 
     const newProps = _.merge(
         { options: _.cloneDeep(defaultOptions) },
