@@ -40,32 +40,34 @@ const Form = () => {
       is_active: true,
     },
   });
-
+  
   const snackbar = useSnackbar();
   const history = useHistory();
   const { id } = useParams<any>();
   const [entity, setEntity] = useState<Genre | null>(null);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
-
+  
   useEffect(() => {
     let isSubscribed = true;
     (async function loadData() {
       setLoading(true);
-      const promises = [categoryResource.list()];
+      const promises = [
+        categoryResource.list({ queryParams: { all: '' } }),
+      ];
       if (id) {
         promises.push(genreResource.get(id));
       }
-
+  
       try {
         const [
           categoriesResponse,
           entityResponse,
         ] = await Promise.all(promises);
-
+    
         if (isSubscribed) {
           setCategories(categoriesResponse.data.data);
-
+      
           if (id) {
             setEntity(entityResponse.data.data);
             const categories_id = entityResponse.data.data.categories
@@ -86,33 +88,33 @@ const Form = () => {
         setLoading(false);
       }
     })();
-
+    
     return () => {
       isSubscribed = false;
     };
   }, [id, reset, snackbar]);
-
+  
   async function onSubmit(formData: any, event: any) {
     setLoading(true);
-
+    
     try {
-
+      
       const { data } = !entity
           ? await genreResource.create(formData)
-          : await genreResource.update(entity.id, formData);
-
+          :await genreResource.update(entity.id, formData);
+      
       snackbar.enqueueSnackbar(
           `${ data.data.name } salvo com sucesso!`,
           { variant: 'success' },
       );
-
+      
       setTimeout(() => {
         event
             ? (
                 id ? history.replace(`/genres/${ data.data.id }/edit`)
-                    : history.push(`/genres/${ data.data.id }/edit`)
+                    :history.push(`/genres/${ data.data.id }/edit`)
             )
-            : history.push('/genres');
+            :history.push('/genres');
       });
     } catch (e) {
       console.log(e);
@@ -124,9 +126,10 @@ const Form = () => {
       setLoading(false);
     }
   }
-
+  
   return (
-      <DefaultForm onSubmit={ handleSubmit(onSubmit) } GridItemProps={{xs: 12, md: 6}}>
+      <DefaultForm onSubmit={ handleSubmit(onSubmit) }
+                   GridItemProps={ { xs: 12, md: 6 } }>
         <TextField
             { ...register('name') }
             label={ 'Nome' }
@@ -154,7 +157,8 @@ const Form = () => {
             errors.categories_id?.message }
             InputLabelProps={ { shrink: true } }
         >
-          <MenuItem value={ '' } disabled>Selecione as categorias</MenuItem>
+          <MenuItem value={ '' } disabled>Selecione as
+            categorias</MenuItem>
           {
             categories.map(category => (
                 <MenuItem key={ category.id }
@@ -167,7 +171,8 @@ const Form = () => {
         <Checkbox
             defaultChecked
             { ...register('is_active') }
-            onChange={ () => setValue('is_active', !getValues('is_active')) }
+            onChange={ () => setValue('is_active',
+                !getValues('is_active')) }
         />
         Ativo?
         <SubmitActions

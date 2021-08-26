@@ -7,8 +7,12 @@ import castMemberResource from '../../resource/cast-member.resource';
 import { ResponseList } from '../../interfaces/interfaces';
 import { Badge } from '../../components/Badge';
 import { Mapper } from '../../util/mapper';
-import DefaultTable, { TableColumn } from '../../components/Table';
+import DefaultTable, { makeActionsStyles, TableColumn } from '../../components/Table';
 import { useSnackbar } from 'notistack';
+import { IconButton } from '@material-ui/core';
+import { Link } from 'react-router-dom';
+import EditIcon from '@material-ui/icons/Edit';
+import { MuiThemeProvider } from '@material-ui/core/styles';
 
 const columnsDefinition: TableColumn[] = [
     {
@@ -49,6 +53,21 @@ const columnsDefinition: TableColumn[] = [
         name: 'actions',
         label: 'Ações',
         width: '13%',
+        options: {
+            sort: false,
+            customBodyRender(value, tableMeta) {
+                return (
+                    <IconButton
+                        color={ 'secondary' }
+                        component={ Link }
+                        to={ `cast-members/${ tableMeta.rowData[0] }/edit` }
+                    
+                    >
+                        <EditIcon/>
+                    </IconButton>
+                );
+            },
+        },
     },
 ];
 
@@ -83,12 +102,14 @@ const Table = () => {
     }, [snackbar]);
 
     return (
-        <DefaultTable
-            title=""
-            columns={ columnsDefinition }
-            data={ data }
-            loading={ loading }
-        />
+        <MuiThemeProvider theme={ makeActionsStyles(columnsDefinition.length - 1) }>
+            <DefaultTable
+                title=""
+                columns={ columnsDefinition }
+                data={ data }
+                loading={ loading }
+            />
+        </MuiThemeProvider>
     );
 };
 export default Table;

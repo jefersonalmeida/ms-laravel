@@ -1,23 +1,22 @@
 import { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 
 export default class ApiResource {
-
+  
   constructor(protected http: AxiosInstance, protected resource: string) {
   }
-
-  list<T = any>(): Promise<AxiosResponse<T>> {
-    const config: AxiosRequestConfig = {
-      params: {
-        all: '',
-      },
-    };
+  
+  list<T = any>(options?: { queryParams?: any }): Promise<AxiosResponse<T>> {
+    const config: AxiosRequestConfig = {};
+    if (options && options.queryParams) {
+      config.params = options.queryParams;
+    }
     return this.http.get<T>(this.resource, config);
   }
-
+  
   get<T = any>(id: number | string): Promise<AxiosResponse<T>> {
-    return this.http.get<T>(`${this.resource}/${id}`);
+    return this.http.get<T>(`${ this.resource }/${ id }`);
   }
-
+  
   create<T = any>(data: any): Promise<AxiosResponse<T>> {
     return this.http.post<T>(this.resource, data);
   }
