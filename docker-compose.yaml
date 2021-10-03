@@ -12,10 +12,12 @@ services:
     environment:
       - CHOKIDAR_USEPOLLING=true
     volumes:
-      - .:/var/www
-      - ./.docker/php/custom.ini:/usr/local/etc/php/conf.d/custom.ini
+      - .:/var/www:Z
+      - ./.docker/php/custom.ini:/usr/local/etc/php/conf.d/custom.ini:Z
     networks:
       - app-network
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     depends_on:
       - db
       - redis
@@ -26,7 +28,7 @@ services:
     restart: unless-stopped
     tty: true
     ports:
-      - "8000:80"
+      - "8010:80"
     volumes:
       - .:/var/www
     networks:
@@ -43,8 +45,8 @@ services:
     ports:
       - "33006:3306"
     volumes:
-      - ./.docker/dbdata:/var/lib/mysql
-      - ./.docker/mysql:/docker-entrypoint-initdb.d
+      - ./.docker/dbdata:/var/lib/mysql:Z
+      - ./.docker/mysql:/docker-entrypoint-initdb.d:Z
     environment:
       - MYSQL_ROOT_PASSWORD=root
     networks:

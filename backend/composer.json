@@ -15,7 +15,8 @@
         "laravel/framework": "^8.12",
         "laravel/tinker": "^2.5",
         "superbalist/laravel-google-cloud-storage": "^2.2",
-        "tucker-eric/eloquentfilter": "^3.0"
+        "tucker-eric/eloquentfilter": "^3.0",
+        "vizir/laravel-keycloak-web-guard": "^2.3"
     },
     "require-dev": {
         "barryvdh/laravel-ide-helper": "^2.10",
