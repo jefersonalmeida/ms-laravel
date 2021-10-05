@@ -1,0 +1,9 @@
+### GET ALL
+GET {{endpoint}}/categories?all
+Accept: application/json
+Authorization: Bearer {{access_token}}
+
+### GET ALL
+GET {{endpoint}}/categories?search=&per_page=20
+Accept: application/json
+Authorization: Bearer {{access_token}}

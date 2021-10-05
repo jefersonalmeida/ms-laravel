@@ -58,6 +58,8 @@ return [
         */
 
         'public' => env('JWT_PUBLIC_KEY'),
+        // 'public' => "-----BEGIN PUBLIC KEY-----\n" . wordwrap(env('JWT_PUBLIC_KEY'), 64, "\n", true) . "\n-----END PUBLIC KEY-----",
+        // 'public' => env('JWT_PUBLIC_KEY', 'file://' . storage_path('credentials/keycloak/public.key.pub')),
 
         /*
         |--------------------------------------------------------------------------
@@ -275,7 +277,7 @@ return [
         |
         */
 
-        'jwt' => Tymon\JWTAuth\Providers\JWT\Lcobucci::class,
+        'jwt' => Tymon\JWTAuth\Providers\JWT\Namshi::class,
 
         /*
         |--------------------------------------------------------------------------

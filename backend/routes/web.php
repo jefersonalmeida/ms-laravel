@@ -19,6 +19,7 @@ Route::get('/', function () {
 
 Route::group(['middleware' => 'auth'], function() {
     Route::get('/admin', function () {
+        // dd(session('_keycloak_token'));
         return view('welcome');
     });
 });

@@ -15,13 +15,12 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
+Route::group(['middleware' => 'auth:api'], function() {
+    $exceptCreateAndEdit = ['create', 'edit'];
+
+    Route::resource('categories', Api\CategoryController::class)->except($exceptCreateAndEdit);
+    Route::resource('genres', Api\GenreController::class)->except($exceptCreateAndEdit);
+    Route::resource('cast-members', Api\CastMemberController::class)->except($exceptCreateAndEdit);
+    Route::resource('videos', Api\VideoController::class)->except($exceptCreateAndEdit);
 });
 
-$exceptCreateAndEdit = ['create', 'edit'];
-
-Route::resource('categories', Api\CategoryController::class)->except($exceptCreateAndEdit);
-Route::resource('genres', Api\GenreController::class)->except($exceptCreateAndEdit);
-Route::resource('cast-members', Api\CastMemberController::class)->except($exceptCreateAndEdit);
-Route::resource('videos', Api\VideoController::class)->except($exceptCreateAndEdit);

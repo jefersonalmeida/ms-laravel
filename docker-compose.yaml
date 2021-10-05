@@ -12,8 +12,8 @@ services:
     environment:
       - CHOKIDAR_USEPOLLING=true
     volumes:
-      - .:/var/www:Z
-      - ./.docker/php/custom.ini:/usr/local/etc/php/conf.d/custom.ini:Z
+      - .:/var/www
+      - ./.docker/php/custom.ini:/usr/local/etc/php/conf.d/custom.ini
     networks:
       - app-network
     extra_hosts:
@@ -45,8 +45,8 @@ services:
     ports:
       - "33006:3306"
     volumes:
-      - ./.docker/dbdata:/var/lib/mysql:Z
-      - ./.docker/mysql:/docker-entrypoint-initdb.d:Z
+      - ./.docker/dbdata:/var/lib/mysql
+      - ./.docker/mysql:/docker-entrypoint-initdb.d
     environment:
       - MYSQL_ROOT_PASSWORD=root
     networks:

@@ -15,7 +15,7 @@ if [ ! -f ".env.testing" ]; then
 fi
 # cp -R .env.example .env
 # cp -R .env.testing.example .env.testing
-composer install
+composer install --ignore-platform-reqs
 php artisan key:generate
 php artisan migrate
 chmod -R 777 ./storage/
